@@ -245,6 +245,10 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-t
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Edit Mode
     </button>
+    <button class="header-btn" id="export-btn" onclick="exportDashboard()" style="display:none" title="Download index.html with your current data baked in">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Save &amp; Export
+    </button>
     <button class="header-btn primary" id="upload-btn" onclick="openUploadModal()" style="display:none">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Update with Report
@@ -315,19 +319,19 @@ const DB = {
   months:["Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"],
   traffic:    [2,27,86,230,150,182,1400,1900,1600,2300,1800,1400,2800,2700,2700,2600],
   unique:     [2,13,71,149,115,137,1300,1600,1300,2100,1600,1300,2500,2500,2400,2300],
-  purchases:  [0,0,0,16,7,11,9,15,8,12,18,11,12,5,5,0],
-  cvr:        [0,0,0,10.74,6.09,8.03,0.69,0.94,0.62,0.57,1.13,0.85,0.48,0.20,0.21,0],
-  aov:        [0,0,0,150.94,126.85,170.18,125.98,180.66,134.80,135.86,159.79,95.53,229.84,134.85,145.28,0],
-  revenue:    [0,0,0,2414.97,887.97,1872.00,1133.85,2709.95,1078.40,1630.35,2876.20,1050.85,2758.10,674.25,726.40,0],
-  roas:       [null,null,null,null,null,null,5.35,10.27,3.48,5.30,8.99,3.90,9.31,2.33,2.42,null],
-  meta:       [0,0,0,0,0,0,212,264,310,308,320,270,296,290,300,0],
+  purchases:  [0,0,0,16,7,11,9,15,8,12,18,11,12,5,5,9],
+  cvr:        [0,0,0,10.74,6.09,8.03,0.69,0.94,0.62,0.57,1.13,0.85,0.48,0.20,0.21,0.35],
+  aov:        [0,0,0,150.94,126.85,170.18,125.98,180.66,134.80,135.86,159.79,95.53,229.84,134.85,145.28,154.22],
+  revenue:    [0,0,0,2414.97,887.97,1872.00,1133.85,2709.95,1078.40,1630.35,2876.20,1050.85,2758.10,674.25,726.40,925.30],
+  roas:       [null,null,null,null,null,null,5.35,10.27,3.48,5.30,8.99,3.90,9.31,2.33,2.42,3.08],
+  meta:       [0,0,0,0,0,0,212,264,310,308,320,270,296,290,300,300],
   email:      [0,0,175,173,178,216,238,276,314,366,423,461,514,569,628,672],
   emailGrowth:[0,0,175,-2,5,38,22,38,38,52,57,38,53,55,59,44],
 };
 
 /* ── State ── */
 const isClient = new URLSearchParams(window.location.search).get('view') === 'client';
-let currentTab = isClient ? DB.months.length - 1 : 'all'; // client lands on latest month
+let currentTab = DB.months.length - 1; // always land on most recent month
 let editMode = false;
 let editModalIndex = null;
 let uploadedFiles = [];
@@ -353,6 +357,7 @@ function init(){
     document.getElementById('client-badge').style.display='flex';
   } else {
     document.getElementById('edit-btn').style.display='flex';
+    document.getElementById('export-btn').style.display='flex';
     document.getElementById('upload-btn').style.display='flex';
   }
   document.getElementById('data-through').textContent = DB.months[DB.months.length-1];
@@ -1089,6 +1094,52 @@ Respond ONLY with valid JSON, no markdown:
 
 function fileToBase64(file){
   return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('Read failed'));r.readAsDataURL(file);});
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EXPORT — rewrites the DB const in the file and downloads index.html
+   ═══════════════════════════════════════════════════════════════════════ */
+function exportDashboard(){
+  const btn = document.getElementById('export-btn');
+  btn.innerHTML = `<div class="spinner" style="border-color:rgba(56,121,165,0.3);border-top-color:var(--blue)"></div> Saving…`;
+  btn.disabled = true;
+
+  // Fetch the current HTML source from the server
+  fetch(window.location.pathname + window.location.search)
+    .then(r => r.text())
+    .then(html => {
+      // Build the new DB block as a clean string
+      const newDBString = `const DB = ${JSON.stringify(DB, null, 2)};`;
+
+      // Replace everything between "const DB = {" and the closing "};" of the DB object
+      // We match the original DB declaration using a regex that captures the full block
+      const updated = html.replace(
+        /const DB = \{[\s\S]*?\n\};/,
+        newDBString
+      );
+
+      // Download
+      const blob = new Blob([updated], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved!`;
+      setTimeout(()=>{
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;
+      }, 2500);
+    })
+    .catch(()=>{
+      // Fallback: if fetch of self fails (e.g. file:// protocol), build from scratch isn't feasible
+      // so we just alert the user
+      alert('Export failed — this can happen if you opened the file directly from your desktop.\n\nTo use Export, view the dashboard from your Vercel URL instead.');
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;
+    });
 }
 
 /* ── Go ── */
