@@ -8,757 +8,569 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:        #f6f4ee;
-      --surface:   #ffffff;
-      --surface2:  #eeeae0;
-      --blue:      #3879a5;
-      --blue-dark: #2c6589;
-      --blue-pale: #d4e8f5;
-      --grey:      #bec3c6;
-      --grey-dk:   #7a8588;
-      --text:      #18242a;
-      --muted:     #6b7577;
-      --border:    rgba(190,195,198,0.35);
-      --shadow:    0 2px 20px rgba(56,121,165,0.07);
+      --bg:#f6f4ee; --surface:#fff; --surface2:#eeeae0;
+      --blue:#3879a5; --blue-dark:#2c6589; --blue-pale:rgba(56,121,165,0.10);
+      --grey:#bec3c6; --grey-dk:#7a8588; --text:#18242a; --muted:#6b7577;
+      --border:rgba(190,195,198,0.35); --shadow:0 2px 20px rgba(56,121,165,0.07);
+      --green:#4cad72; --red:#d9534f;
     }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,sans-serif; font-size:14px; line-height:1.5; min-height:100vh; }
+    body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events:none; z-index:999; }
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--grey);border-radius:4px}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.3}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{opacity:0;animation:fadeUp .55s ease forwards}
+    .d1{animation-delay:.05s}.d2{animation-delay:.10s}.d3{animation-delay:.15s}.d4{animation-delay:.20s}.d5{animation-delay:.25s}.d6{animation-delay:.30s}.d7{animation-delay:.35s}.d8{animation-delay:.40s}.d9{animation-delay:.45s}
 
-    html { scroll-behavior: smooth; }
+    header{position:sticky;top:0;z-index:100;background:rgba(246,244,238,0.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:34px;height:34px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center}
+    .logo-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+    .logo-sub{font-size:11px;color:var(--muted);letter-spacing:.05em;margin-top:1px}
+    .header-right{display:flex;align-items:center;gap:14px}
+    .live-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease infinite}
+    .upload-btn{display:flex;align-items:center;gap:7px;background:var(--blue);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;transition:background .18s}
+    .upload-btn:hover{background:var(--blue-dark)}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      min-height: 100vh;
-    }
+    main{max-width:1200px;margin:0 auto;padding:40px 32px 80px}
+    .page-eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+    .page-h1{font-family:'DM Serif Display',serif;font-size:clamp(36px,5vw,52px);color:var(--text);line-height:1.1}
+    .page-sub{font-size:13px;color:var(--muted);margin-top:6px}
+    .page-title{margin-bottom:36px}
 
-    /* ── grain overlay ── */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 999;
-    }
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
+    .card:hover{box-shadow:0 6px 32px rgba(56,121,165,.10);transform:translateY(-1px)}
 
-    /* ── scrollbar ── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--grey); border-radius: 4px; }
+    .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px}
+    @media(min-width:640px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:1024px){.kpi-grid{grid-template-columns:repeat(6,1fr)}}
+    .kpi{padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+    .kpi.highlight{border-color:rgba(56,121,165,.2);background:rgba(56,121,165,.04)}
+    .kpi-label{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .kpi.highlight .kpi-label{color:var(--blue)}
+    .kpi-value{font-family:'DM Serif Display',serif;font-size:26px;line-height:1;color:var(--text)}
+    .kpi.highlight .kpi-value{color:var(--blue)}
+    .kpi-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-    /* ── animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
-    }
+    .chart-row{display:grid;gap:20px;margin-bottom:20px}
+    @media(min-width:900px){.chart-row.cols-5-3{grid-template-columns:5fr 3fr}.chart-row.cols-2{grid-template-columns:1fr 1fr}}
+    .chart-card{padding:24px}
+    .chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+    .chart-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .chart-big{font-family:'DM Serif Display',serif;font-size:32px;color:var(--text);line-height:1}
+    .chart-small{font-family:'DM Serif Display',serif;font-size:24px;color:var(--grey-dk);line-height:1}
+    .chart-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .chart-canvas-wrap{position:relative;height:200px}
+    .pill{display:inline-flex;align-items:center;background:var(--blue-pale);color:var(--blue);font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px}
 
-    .fade-up { opacity: 0; animation: fadeUp 0.55s ease forwards; }
-    .d1 { animation-delay: 0.05s; }
-    .d2 { animation-delay: 0.10s; }
-    .d3 { animation-delay: 0.15s; }
-    .d4 { animation-delay: 0.20s; }
-    .d5 { animation-delay: 0.25s; }
-    .d6 { animation-delay: 0.30s; }
-    .d7 { animation-delay: 0.35s; }
-    .d8 { animation-delay: 0.40s; }
-    .d9 { animation-delay: 0.45s; }
+    .projection{background:var(--blue);border-radius:14px;padding:28px 32px;display:flex;flex-direction:column;gap:20px;margin-bottom:20px;border:none}
+    @media(min-width:640px){.projection{flex-direction:row;align-items:center;justify-content:space-between}}
+    .proj-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px}
+    .proj-amount{font-family:'DM Serif Display',serif;font-size:44px;color:#fff;line-height:1}
+    .proj-sub{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px}
+    .proj-stats{display:flex;gap:32px}
+    .proj-stat-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px}
+    .proj-stat-val{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;line-height:1}
 
-    /* ── layout ── */
-    header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(246,244,238,0.85);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    /* MODAL */
+    .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(24,36,42,.45);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+    .modal-backdrop.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.15);animation:slideIn .3s ease}
+    .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+    .modal-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text)}
+    .modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+    .close-btn{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:6px}
+    .close-btn:hover{color:var(--text);background:var(--surface2)}
+    .drop-zone{border:2px dashed var(--grey);border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;margin-bottom:16px}
+    .drop-zone:hover,.drop-zone.dragging{border-color:var(--blue);background:rgba(56,121,165,.04)}
+    .drop-icon{margin:0 auto 12px;color:var(--grey-dk)}
+    .drop-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px}
+    .drop-title span{color:var(--blue)}
+    .drop-hint{font-size:12px;color:var(--muted)}
+    #file-input{display:none}
+    .file-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+    .file-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:13px}
+    .file-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+    .file-item-size{color:var(--muted);flex-shrink:0}
+    .file-remove{background:none;border:none;cursor:pointer;color:var(--muted);padding:2px}
+    .file-remove:hover{color:var(--red)}
+    .api-key-row{margin-bottom:16px}
+    .api-key-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+    .api-key-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none}
+    .api-key-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,121,165,.12)}
+    .api-key-hint{font-size:11px;color:var(--muted);margin-top:5px}
+    .parse-btn{width:100%;padding:14px;border-radius:12px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s}
+    .parse-btn:hover:not(:disabled){background:var(--blue-dark)}
+    .parse-btn:disabled{opacity:.55;cursor:not-allowed}
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    .status-msg{display:flex;align-items:flex-start;gap:8px;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:12px}
+    .status-msg.success{background:#f0faf5;border:1px solid #b4dfc7;color:#236b42}
+    .status-msg.error{background:#fff4f4;border:1px solid #f5c0be;color:#8b2020}
+    .parse-note{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
 
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .logo-icon {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--blue);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .logo-icon svg { color: white; }
-    .logo-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; color: var(--text); }
-    .logo-sub  { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-top: 1px; }
-
-    .live-badge {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; color: var(--muted); letter-spacing: 0.04em;
-    }
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: #4cad72;
-      animation: pulse-dot 2s ease infinite;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 32px 80px;
-    }
-
-    /* ── page title ── */
-    .page-title { margin-bottom: 36px; }
-    .page-eyebrow {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--blue); margin-bottom: 6px;
-    }
-    .page-h1 {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: clamp(36px, 5vw, 52px); color: var(--text); line-height: 1.1;
-    }
-    .page-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
-
-    /* ── cards ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      transition: box-shadow 0.2s ease, transform 0.2s ease;
-    }
-    .card:hover {
-      box-shadow: 0 6px 32px rgba(56,121,165,0.10);
-      transform: translateY(-1px);
-    }
-
-    /* ── KPI grid ── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-    @media (min-width: 640px)  { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .kpi-grid { grid-template-columns: repeat(6, 1fr); } }
-
-    .kpi {
-      padding: 18px 16px;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .kpi.highlight { border-color: rgba(56,121,165,0.2); background: rgba(56,121,165,0.04); }
-    .kpi-label {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
-    }
-    .kpi.highlight .kpi-label { color: var(--blue); }
-    .kpi-value {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 26px; line-height: 1; color: var(--text);
-    }
-    .kpi.highlight .kpi-value { color: var(--blue); }
-    .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    /* ── chart grid ── */
-    .chart-row {
-      display: grid;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .chart-row.cols-5-3 {
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 900px) {
-      .chart-row.cols-5-3 { grid-template-columns: 5fr 3fr; }
-      .chart-row.cols-2   { grid-template-columns: 1fr 1fr; }
-    }
-
-    .chart-card { padding: 24px; }
-
-    .chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-    .chart-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
-    }
-    .chart-big {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 32px; color: var(--text); line-height: 1;
-    }
-    .chart-small {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 24px; color: var(--grey-dk); line-height: 1;
-    }
-    .chart-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
-    .chart-canvas-wrap { position: relative; height: 200px; }
-
-    /* ── pill badge ── */
-    .pill {
-      display: inline-flex; align-items: center;
-      background: rgba(56,121,165,0.10);
-      color: var(--blue);
-      font-size: 11px; font-weight: 600;
-      padding: 4px 12px; border-radius: 99px;
-    }
-
-    /* ── projection banner ── */
-    .projection {
-      background: var(--blue);
-      border-radius: 14px;
-      padding: 28px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-bottom: 20px;
-      border: none;
-    }
-    @media (min-width: 640px) {
-      .projection { flex-direction: row; align-items: center; justify-content: space-between; }
-    }
-    .projection-left .proj-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
-      text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 6px;
-    }
-    .projection-left .proj-amount {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 44px; color: white; line-height: 1;
-    }
-    .projection-left .proj-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 6px; }
-    .proj-stats { display: flex; gap: 32px; }
-    .proj-stat-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 4px;
-    }
-    .proj-stat-val {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 26px; color: white; line-height: 1;
-    }
-
-    /* ── footer ── */
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      padding: 20px;
-      border-top: 1px solid var(--border);
-    }
-
-    @media (max-width: 600px) {
-      main { padding: 24px 16px 60px; }
-      header { padding: 0 16px; }
-      .chart-big { font-size: 26px; }
-      .projection-left .proj-amount { font-size: 32px; }
-    }
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)}
+    @media(max-width:600px){main{padding:24px 16px 60px}header{padding:0 16px}.chart-big{font-size:26px}.proj-amount{font-size:32px}.upload-btn span{display:none}}
   </style>
 </head>
 <body>
 
-<!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
 <header>
   <div class="logo">
     <div class="logo-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2C6 8 4 13 4 16a8 8 0 0016 0c0-3-2-8-8-14z"/>
-      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 8 4 13 4 16a8 8 0 0016 0c0-3-2-8-8-14z"/></svg>
     </div>
     <div>
       <div class="logo-name">Space Water</div>
       <div class="logo-sub">Marketing Dashboard</div>
     </div>
   </div>
-  <div class="live-badge">
-    <span class="live-dot"></span>
-    Data through Apr 2025
+  <div class="header-right">
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      <span id="data-through">Data through Apr 2025</span>
+    </div>
+    <button class="upload-btn" onclick="openModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Update with Report</span>
+    </button>
   </div>
 </header>
 
-<!-- ══ MAIN ════════════════════════════════════════════════════════════════ -->
 <main>
-
-  <!-- Page title -->
   <div class="page-title fade-up d1">
     <p class="page-eyebrow">Marketing Intelligence</p>
     <h1 class="page-h1">Performance Dashboard</h1>
-    <p class="page-sub">Jan 2024 – Apr 2025 &nbsp;·&nbsp; Space Water Canada</p>
+    <p class="page-sub" id="page-sub">Jan 2024 – Apr 2025 · Space Water Canada</p>
   </div>
 
-  <!-- KPI Cards -->
   <div class="kpi-grid">
-
     <div class="card kpi fade-up d2">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        Avg Monthly Rev
-      </div>
-      <div>
-        <div class="kpi-value">$1,651</div>
-        <div class="kpi-sub">per month avg</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Avg Monthly Rev</div>
+      <div><div class="kpi-value" id="kpi-avg-rev">—</div><div class="kpi-sub">months with sales</div></div>
     </div>
-
     <div class="card kpi highlight fade-up d3">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Best ROAS
-      </div>
-      <div>
-        <div class="kpi-value">10.27×</div>
-        <div class="kpi-sub">Aug 2024</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Best ROAS</div>
+      <div><div class="kpi-value" id="kpi-best-roas">—</div><div class="kpi-sub" id="kpi-best-roas-month">—</div></div>
     </div>
-
     <div class="card kpi fade-up d4">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Avg Traffic
-      </div>
-      <div>
-        <div class="kpi-value">2,067</div>
-        <div class="kpi-sub">sessions / month</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Avg Traffic</div>
+      <div><div class="kpi-value" id="kpi-avg-traffic">—</div><div class="kpi-sub">sessions/mo (paid era)</div></div>
     </div>
-
     <div class="card kpi fade-up d5">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        Avg AOV
-      </div>
-      <div>
-        <div class="kpi-value">$149</div>
-        <div class="kpi-sub">avg order value</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Avg AOV</div>
+      <div><div class="kpi-value" id="kpi-avg-aov">—</div><div class="kpi-sub">average order value</div></div>
     </div>
-
     <div class="card kpi fade-up d6">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Email List
-      </div>
-      <div>
-        <div class="kpi-value">672</div>
-        <div class="kpi-sub">+45/mo avg growth</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email List</div>
+      <div><div class="kpi-value" id="kpi-email">—</div><div class="kpi-sub" id="kpi-email-sub">—</div></div>
     </div>
-
     <div class="card kpi fade-up d7">
-      <div class="kpi-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="12" x2="7" y2="17"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="17" y1="10" x2="17" y2="17"/></svg>
-        Avg ROAS
-      </div>
-      <div>
-        <div class="kpi-value">5.70×</div>
-        <div class="kpi-sub">since ads started</div>
-      </div>
+      <div class="kpi-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="12" x2="7" y2="17"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="17" y1="10" x2="17" y2="17"/></svg>Avg ROAS</div>
+      <div><div class="kpi-value" id="kpi-avg-roas">—</div><div class="kpi-sub">since ads started</div></div>
     </div>
-
   </div>
 
-  <!-- Revenue + Traffic -->
   <div class="chart-row cols-5-3">
-
     <div class="card chart-card fade-up d5">
       <div class="chart-header">
-        <div>
-          <div class="chart-label">Revenue</div>
-          <div class="chart-big">$4,158</div>
-          <div class="chart-sub">2025 YTD</div>
-        </div>
-        <div style="text-align:right">
-          <div class="chart-label">2024 Total</div>
-          <div class="chart-small">$15,654</div>
-        </div>
+        <div><div class="chart-label">Total Revenue</div><div class="chart-big" id="rev-2025-ytd">—</div><div class="chart-sub">2025 YTD</div></div>
+        <div style="text-align:right"><div class="chart-label">2024 Total</div><div class="chart-small" id="rev-2024-total">—</div></div>
       </div>
-      <div class="chart-canvas-wrap">
-        <canvas id="revenueChart"></canvas>
-      </div>
+      <div class="chart-canvas-wrap"><canvas id="revenueChart"></canvas></div>
     </div>
-
     <div class="card chart-card fade-up d6">
       <div class="chart-header">
-        <div>
-          <div class="chart-label">Web Traffic</div>
-          <div class="chart-big">2,700</div>
-          <div class="chart-sub">sessions, Mar '25</div>
-        </div>
+        <div><div class="chart-label">Web Traffic</div><div class="chart-big" id="traffic-latest">—</div><div class="chart-sub" id="traffic-latest-month">latest month</div></div>
       </div>
-      <div class="chart-canvas-wrap">
-        <canvas id="trafficChart"></canvas>
-      </div>
+      <div class="chart-canvas-wrap"><canvas id="trafficChart"></canvas></div>
     </div>
-
   </div>
 
-  <!-- ROAS + Email -->
   <div class="chart-row cols-2">
-
     <div class="card chart-card fade-up d6">
       <div class="chart-header">
-        <div>
-          <div class="chart-label">ROAS</div>
-          <div class="chart-big">2.42×</div>
-          <div class="chart-sub">Mar '25 (most recent)</div>
-        </div>
-        <div style="text-align:right">
-          <div class="chart-label">2025 Meta Spend</div>
-          <div class="chart-small" style="color:var(--blue)">$886</div>
-          <div class="chart-sub">YTD</div>
-        </div>
+        <div><div class="chart-label">ROAS · Meta Ads</div><div class="chart-big" id="roas-latest">—</div><div class="chart-sub" id="roas-latest-month">most recent</div></div>
+        <div style="text-align:right"><div class="chart-label">2025 Meta Spend</div><div class="chart-small" style="color:var(--blue)" id="meta-spend-ytd">—</div><div class="chart-sub">YTD</div></div>
       </div>
-      <div class="chart-canvas-wrap">
-        <canvas id="roasChart"></canvas>
-      </div>
+      <div class="chart-canvas-wrap"><canvas id="roasChart"></canvas></div>
     </div>
-
     <div class="card chart-card fade-up d7">
       <div class="chart-header">
-        <div>
-          <div class="chart-label">Email List Growth</div>
-          <div class="chart-big">672</div>
-          <div class="chart-sub">total subscribers</div>
-        </div>
-        <div>
-          <span class="pill">+45/mo avg</span>
-        </div>
+        <div><div class="chart-label">Email List</div><div class="chart-big" id="email-total">—</div><div class="chart-sub" id="email-sub">total subscribers</div></div>
+        <div><span class="pill" id="email-growth-pill">—</span></div>
       </div>
-      <div class="chart-canvas-wrap">
-        <canvas id="emailChart"></canvas>
-      </div>
+      <div class="chart-canvas-wrap"><canvas id="emailChart"></canvas></div>
     </div>
-
   </div>
 
-  <!-- Conversion Rate -->
   <div class="chart-row" style="margin-bottom:20px">
     <div class="card chart-card fade-up d8">
       <div class="chart-header">
-        <div>
-          <div class="chart-label">Conversion Rate &amp; AOV</div>
-          <div class="chart-big">0.63%</div>
-          <div class="chart-sub">avg CVR · paid traffic era</div>
-        </div>
-        <div style="text-align:right">
-          <div class="chart-label">Avg AOV</div>
-          <div class="chart-small">$149.21</div>
-        </div>
+        <div><div class="chart-label">Conversion Rate &amp; AOV</div><div class="chart-big" id="cvr-avg">—</div><div class="chart-sub">avg CVR · paid traffic era</div></div>
+        <div style="text-align:right"><div class="chart-label">Avg AOV</div><div class="chart-small" id="aov-avg">—</div></div>
       </div>
-      <div class="chart-canvas-wrap" style="height:180px">
-        <canvas id="cvrChart"></canvas>
-      </div>
+      <div class="chart-canvas-wrap" style="height:180px"><canvas id="cvrChart"></canvas></div>
     </div>
   </div>
 
-  <!-- Projection Banner -->
+  <div class="chart-row" style="margin-bottom:20px">
+    <div class="card chart-card fade-up d8">
+      <div class="chart-header">
+        <div><div class="chart-label">Monthly Purchases</div><div class="chart-big" id="purchases-total">—</div><div class="chart-sub">total orders on record</div></div>
+        <div style="text-align:right"><div class="chart-label">Best Month</div><div class="chart-small" id="purchases-best">—</div><div class="chart-sub" id="purchases-best-month">—</div></div>
+      </div>
+      <div class="chart-canvas-wrap" style="height:160px"><canvas id="purchasesChart"></canvas></div>
+    </div>
+  </div>
+
   <div class="projection fade-up d9">
-    <div class="projection-left">
+    <div>
       <div class="proj-label">Ad Spend Projection</div>
-      <div class="proj-amount">$6,161</div>
+      <div class="proj-amount">$6,161.54</div>
       <div class="proj-sub">Projected revenue at $600/mo Meta spend · 5.70× ROAS basis</div>
     </div>
     <div class="proj-stats">
-      <div>
-        <div class="proj-stat-label">Spend</div>
-        <div class="proj-stat-val">$600</div>
-      </div>
-      <div>
-        <div class="proj-stat-label">Avg ROAS</div>
-        <div class="proj-stat-val">5.70×</div>
-      </div>
-      <div>
-        <div class="proj-stat-label">Projected</div>
-        <div class="proj-stat-val">$6,161</div>
-      </div>
+      <div><div class="proj-stat-label">Spend</div><div class="proj-stat-val">$600</div></div>
+      <div><div class="proj-stat-label">Avg ROAS</div><div class="proj-stat-val">5.70×</div></div>
+      <div><div class="proj-stat-label">Projected</div><div class="proj-stat-val">$6,161</div></div>
     </div>
   </div>
-
 </main>
 
-<footer>
-  Space Water · Marketing Dashboard · Data through April 2025
-</footer>
+<footer>Space Water · Marketing Dashboard · Data through April 2025</footer>
 
-<!-- ══ CHARTS ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Update Dashboard</div>
+      <button class="close-btn" onclick="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal-sub">Drop in your monthly report — PDF, screenshot, or CSV — and Claude will extract the data and update every chart automatically.</p>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" multiple accept=".pdf,.png,.jpg,.jpeg,.csv" onchange="handleFiles(this.files)" />
+      <svg class="drop-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="drop-title">Drop files here or <span>browse</span></div>
+      <div class="drop-hint">PDF, PNG, JPG, CSV accepted</div>
+    </div>
+    <div class="file-list" id="file-list"></div>
+    <div class="api-key-row">
+      <label class="api-key-label" for="api-key">Anthropic API Key</label>
+      <input type="password" id="api-key" class="api-key-input" placeholder="sk-ant-..." autocomplete="off" />
+      <div class="api-key-hint">Used only for this request — never stored anywhere.</div>
+    </div>
+    <button class="parse-btn" id="parse-btn" onclick="parseReport()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Parse &amp; Update Dashboard
+    </button>
+    <div id="status-msg"></div>
+    <p class="parse-note">Claude reads your report and updates all charts automatically.</p>
+  </div>
+</div>
+
 <script>
-/* ── shared defaults ── */
-const BLUE      = '#3879a5';
-const BLUE_PALE = 'rgba(56,121,165,0.12)';
-const GREY      = '#bec3c6';
-const MUTED     = '#6b7577';
-const GRID      = 'rgba(190,195,198,0.25)';
-
-Chart.defaults.font.family  = "'DM Sans', system-ui, sans-serif";
-Chart.defaults.font.size    = 11;
-Chart.defaults.color        = MUTED;
-Chart.defaults.plugins.legend.display = false;
-
-const tooltipDefaults = {
-  backgroundColor: '#ffffff',
-  titleColor: MUTED,
-  bodyColor: '#18242a',
-  borderColor: 'rgba(190,195,198,0.4)',
-  borderWidth: 1,
-  padding: 10,
-  cornerRadius: 8,
-  displayColors: false,
+/* ══════════════════════════════════════════════════════════════════════════
+   DATA — sourced directly from Space Water Google Sheets CSV
+   Jan 2024 → Apr 2025 (index 0–15)
+   ══════════════════════════════════════════════════════════════════════════ */
+const DB = {
+  months:["Jan '24","Feb '24","Mar '24","Apr '24","May '24","Jun '24","Jul '24","Aug '24","Sep '24","Oct '24","Nov '24","Dec '24","Jan '25","Feb '25","Mar '25","Apr '25"],
+  traffic:    [2,27,86,230,150,182,1400,1900,1600,2300,1800,1400,2800,2700,2700,2600],
+  unique:     [2,13,71,149,115,137,1300,1600,1300,2100,1600,1300,2500,2500,2400,2300],
+  purchases:  [0,0,0,16,7,11,9,15,8,12,18,11,12,5,5,0],
+  cvr:        [0,0,0,10.74,6.09,8.03,0.69,0.94,0.62,0.57,1.13,0.85,0.48,0.20,0.21,0],
+  aov:        [0,0,0,150.94,126.85,170.18,125.98,180.66,134.80,135.86,159.79,95.53,229.84,134.85,145.28,0],
+  revenue:    [0,0,0,2414.97,887.97,1872.00,1133.85,2709.95,1078.40,1630.35,2876.20,1050.85,2758.10,674.25,726.40,0],
+  roas:       [null,null,null,null,null,null,5.35,10.27,3.48,5.30,8.99,3.90,9.31,2.33,2.42,null],
+  meta:       [0,0,0,0,0,0,212,264,310,308,320,270,296,290,300,0],
+  email:      [0,0,175,173,178,216,238,276,314,366,423,461,514,569,628,672],
+  emailGrowth:[0,0,175,-2,5,38,22,38,38,52,57,38,53,55,59,44],
 };
 
-const axisDefaults = {
-  grid: { color: GRID, drawBorder: false, drawTicks: false },
-  border: { display: false },
-  ticks: { padding: 6 },
-};
+/* Chart defaults */
+const BLUE='#3879a5',GREY='#bec3c6',MUTED='#6b7577',GRID='rgba(190,195,198,0.25)';
+Chart.defaults.font.family="'DM Sans',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color=MUTED;
+Chart.defaults.plugins.legend.display=false;
+const TT={backgroundColor:'#fff',titleColor:MUTED,bodyColor:'#18242a',borderColor:'rgba(190,195,198,0.4)',borderWidth:1,padding:10,cornerRadius:8,displayColors:false};
+const AX={grid:{color:GRID,drawBorder:false,drawTicks:false},border:{display:false},ticks:{padding:6}};
 
-/* ── DATA ── */
-const months = [
-  "Jan '24","Feb '24","Mar '24","Apr '24","May '24","Jun '24",
-  "Jul '24","Aug '24","Sep '24","Oct '24","Nov '24","Dec '24",
-  "Jan '25","Feb '25","Mar '25","Apr '25"
-];
+let CH={};
+function destroyCharts(){Object.values(CH).forEach(c=>c.destroy());CH={};}
 
-const revenue = [0,0,0,2414.97,887.97,1872,1133.85,2709.95,1078.40,1630.35,2876.20,1050.85,2758.10,674.25,726.40,0];
-const traffic  = [2,27,86,230,150,182,1400,1900,1600,2300,1800,1400,2800,2700,2700,2600];
-const unique   = [2,13,71,149,115,137,1300,1600,1300,2100,1600,1300,2500,2500,2400,2300];
-const roas     = [null,null,null,null,null,null,5.35,10.27,3.48,5.30,8.99,3.90,9.31,2.33,2.42,null];
-const metaSpend= [0,0,0,0,0,0,212,264,310,308,320,270,296,290,300,0];
-const emailList= [0,0,175,173,178,216,238,276,314,366,423,461,514,569,628,672];
-const cvr      = [0,0,0,10.74,6.09,8.03,0.69,0.94,0.62,0.57,1.13,0.85,0.48,0.20,0.21,0];
-const aov      = [0,0,0,150.94,126.85,170.18,125.98,180.66,134.80,135.86,159.79,95.53,229.84,134.85,145.28,0];
+function buildCharts(){
+  destroyCharts();
 
-/* ── 1. Revenue Bar Chart ── */
-const revLabels = months.filter((_,i) => revenue[i] > 0);
-const revVals   = revenue.filter(v => v > 0);
+  /* 1. Revenue */
+  const rp=DB.months.map((m,i)=>({m,v:DB.revenue[i]})).filter(p=>p.v>0);
+  CH.revenue=new Chart(document.getElementById('revenueChart'),{
+    type:'bar',
+    data:{labels:rp.map(p=>p.m),datasets:[{data:rp.map(p=>p.v),backgroundColor:rp.map(p=>p.m.includes("'25")?BLUE:'rgba(56,121,165,0.42)'),borderRadius:5,borderSkipped:'bottom'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  $${c.raw.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2})}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:v=>`$${(v/1000).toFixed(0)}k`}}}}
+  });
 
-new Chart(document.getElementById('revenueChart'), {
-  type: 'bar',
-  data: {
-    labels: revLabels,
-    datasets: [{
-      data: revVals,
-      backgroundColor: months
-        .filter((_,i) => revenue[i] > 0)
-        .map(m => m.includes("'25") ? BLUE : 'rgba(56,121,165,0.45)'),
-      borderRadius: 5,
-      borderSkipped: 'bottom',
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        ...tooltipDefaults,
-        callbacks: {
-          label: ctx => `  $${ctx.raw.toLocaleString('en-CA', {minimumFractionDigits:2,maximumFractionDigits:2})}`
-        }
-      }
-    },
-    scales: {
-      x: { ...axisDefaults, ticks: { ...axisDefaults.ticks, maxRotation: 45, minRotation: 30 } },
-      y: {
-        ...axisDefaults,
-        ticks: { ...axisDefaults.ticks, callback: v => `$${(v/1000).toFixed(0)}k` }
-      }
-    }
-  }
-});
+  /* 2. Traffic */
+  const tp=DB.months.map((m,i)=>({m,t:DB.traffic[i],u:DB.unique[i]})).filter(p=>p.t>0);
+  CH.traffic=new Chart(document.getElementById('trafficChart'),{
+    type:'line',
+    data:{labels:tp.map(p=>p.m),datasets:[
+      {label:'Sessions',data:tp.map(p=>p.t),borderColor:BLUE,borderWidth:2,pointRadius:0,tension:0.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(56,121,165,0.15)');g.addColorStop(1,'rgba(56,121,165,0)');return g;}},
+      {label:'Unique',data:tp.map(p=>p.u),borderColor:GREY,borderWidth:2,pointRadius:0,tension:0.35,borderDash:[4,3]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:24,padding:12,color:MUTED,font:{size:11}}},tooltip:{...TT,callbacks:{label:c=>`  ${c.dataset.label}: ${c.raw.toLocaleString()}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}}}}
+  });
 
-/* ── 2. Traffic Line Chart ── */
-const trafLabels = months.filter((_,i) => traffic[i] > 0);
-const trafVals   = traffic.filter(v => v > 0);
-const uniqVals   = unique.filter((_,i) => traffic[i] > 0 ? true : false)
-                         .filter((_,i) => trafVals[i] !== undefined);
+  /* 3. ROAS */
+  const roasPairs=DB.months.map((m,i)=>({m,r:DB.roas[i]})).filter(p=>p.r!==null);
+  const avgR=roasPairs.reduce((s,p)=>s+p.r,0)/roasPairs.length;
+  CH.roas=new Chart(document.getElementById('roasChart'),{
+    type:'bar',
+    data:{labels:roasPairs.map(p=>p.m),datasets:[{data:roasPairs.map(p=>p.r),backgroundColor:roasPairs.map(p=>p.r>=avgR?BLUE:'rgba(56,121,165,0.42)'),borderRadius:5,borderSkipped:'bottom'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  ROAS: ${c.raw.toFixed(2)}×`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:v=>`${v}×`}}}}
+  });
+  const rc=CH.roas,orig=rc.draw.bind(rc);
+  rc.draw=function(){orig();const ctx=rc.ctx,yS=rc.scales.y,xS=rc.scales.x,y=yS.getPixelForValue(avgR);ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle=GREY;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(xS.left,y);ctx.lineTo(xS.right,y);ctx.stroke();ctx.restore();ctx.fillStyle=MUTED;ctx.font='10px DM Sans,system-ui';ctx.fillText(`avg ${avgR.toFixed(2)}×`,xS.right-58,y-5);};
 
-// rebuild properly
-const trafPairs = months.map((m,i) => ({m, t: traffic[i], u: unique[i]})).filter(p => p.t > 0);
+  /* 4. Email */
+  const ep=DB.months.map((m,i)=>({m,e:DB.email[i]})).filter(p=>p.e>0);
+  CH.email=new Chart(document.getElementById('emailChart'),{
+    type:'line',
+    data:{labels:ep.map(p=>p.m),datasets:[{data:ep.map(p=>p.e),borderColor:BLUE,borderWidth:2,pointRadius:0,tension:0.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(56,121,165,0.18)');g.addColorStop(1,'rgba(56,121,165,0)');return g;}}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  Subscribers: ${c.raw.toLocaleString()}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX}}}
+  });
 
-new Chart(document.getElementById('trafficChart'), {
-  type: 'line',
-  data: {
-    labels: trafPairs.map(p => p.m),
-    datasets: [
-      {
-        label: 'Sessions',
-        data: trafPairs.map(p => p.t),
-        borderColor: BLUE, borderWidth: 2, pointRadius: 0,
-        tension: 0.35, fill: true,
-        backgroundColor: (ctx) => {
-          const g = ctx.chart.ctx.createLinearGradient(0,0,0,200);
-          g.addColorStop(0, 'rgba(56,121,165,0.15)');
-          g.addColorStop(1, 'rgba(56,121,165,0)');
-          return g;
-        }
-      },
-      {
-        label: 'Unique',
-        data: trafPairs.map(p => p.u),
-        borderColor: GREY, borderWidth: 2, pointRadius: 0,
-        tension: 0.35, fill: false, borderDash: [4,3]
-      }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        ...tooltipDefaults,
-        callbacks: {
-          label: ctx => `  ${ctx.dataset.label}: ${ctx.raw.toLocaleString()}`
-        }
-      },
-      legend: { display: true, position: 'bottom', labels: { boxWidth: 24, padding: 12, color: MUTED, font: { size: 11 } } }
-    },
-    scales: {
-      x: { ...axisDefaults, ticks: { ...axisDefaults.ticks, maxRotation: 45, minRotation: 30 } },
-      y: {
-        ...axisDefaults,
-        ticks: { ...axisDefaults.ticks, callback: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v }
-      }
-    }
-  }
-});
+  /* 5. CVR + AOV */
+  const cp=DB.months.map((m,i)=>({m,c:DB.cvr[i],a:DB.aov[i]})).filter(p=>p.c>0);
+  CH.cvr=new Chart(document.getElementById('cvrChart'),{
+    type:'line',
+    data:{labels:cp.map(p=>p.m),datasets:[
+      {label:'CVR %',data:cp.map(p=>p.c),borderColor:BLUE,borderWidth:2,pointRadius:3,pointBackgroundColor:BLUE,tension:0.3,yAxisID:'yCvr'},
+      {label:'AOV $',data:cp.map(p=>p.a),borderColor:GREY,borderWidth:2,pointRadius:0,tension:0.3,borderDash:[4,3],yAxisID:'yAov'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:24,padding:12,color:MUTED,font:{size:11}}},tooltip:{...TT,callbacks:{label:c=>c.datasetIndex===0?`  CVR: ${c.raw.toFixed(2)}%`:`  AOV: $${c.raw.toFixed(2)}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},yCvr:{...AX,position:'left',ticks:{...AX.ticks,callback:v=>`${v}%`}},yAov:{...AX,position:'right',grid:{display:false},ticks:{...AX.ticks,callback:v=>`$${v}`}}}}
+  });
 
-/* ── 3. ROAS Bar Chart ── */
-const roasPairs = months.map((m,i) => ({m, r: roas[i]})).filter(p => p.r !== null);
+  /* 6. Purchases */
+  const pp=DB.months.map((m,i)=>({m,p:DB.purchases[i]})).filter(p=>p.p>0);
+  CH.purchases=new Chart(document.getElementById('purchasesChart'),{
+    type:'bar',
+    data:{labels:pp.map(p=>p.m),datasets:[{data:pp.map(p=>p.p),backgroundColor:pp.map(p=>p.m.includes("'25")?BLUE:'rgba(56,121,165,0.42)'),borderRadius:4,borderSkipped:'bottom'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  Orders: ${c.raw}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,stepSize:2}}}}
+  });
+}
 
-new Chart(document.getElementById('roasChart'), {
-  type: 'bar',
-  data: {
-    labels: roasPairs.map(p => p.m),
-    datasets: [{
-      data: roasPairs.map(p => p.r),
-      backgroundColor: roasPairs.map(p => p.r >= 5.7 ? BLUE : 'rgba(56,121,165,0.45)'),
-      borderRadius: 5, borderSkipped: 'bottom',
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        ...tooltipDefaults,
-        callbacks: { label: ctx => `  ROAS: ${ctx.raw.toFixed(2)}×` }
-      },
-      annotation: {}
-    },
-    scales: {
-      x: { ...axisDefaults, ticks: { ...axisDefaults.ticks, maxRotation: 45, minRotation: 30 } },
-      y: {
-        ...axisDefaults,
-        ticks: { ...axisDefaults.ticks, callback: v => `${v}×` }
-      }
-    }
-  }
-});
+function updateKPIs(){
+  // Avg revenue
+  const rv=DB.revenue.filter(v=>v>0);
+  const avgRev=rv.reduce((s,v)=>s+v,0)/rv.length;
+  document.getElementById('kpi-avg-rev').textContent='$'+avgRev.toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:0});
 
-// Draw avg reference line manually after render
-const roasChart = Chart.getChart('roasChart');
-const origDraw = roasChart.draw.bind(roasChart);
-roasChart.draw = function() {
-  origDraw();
-  const ctx = roasChart.ctx;
-  const yScale = roasChart.scales.y;
-  const xScale = roasChart.scales.x;
-  const y = yScale.getPixelForValue(5.7);
-  ctx.save();
-  ctx.setLineDash([4, 3]);
-  ctx.strokeStyle = GREY;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(xScale.left, y);
-  ctx.lineTo(xScale.right, y);
-  ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle = MUTED;
-  ctx.font = '10px DM Sans, system-ui';
-  ctx.fillText('avg 5.70×', xScale.right - 54, y - 5);
-};
+  // Best ROAS
+  const rAll=DB.roas.filter(v=>v!==null);
+  const bestR=Math.max(...rAll);
+  const bestIdx=DB.roas.indexOf(bestR);
+  document.getElementById('kpi-best-roas').textContent=bestR.toFixed(2)+'×';
+  document.getElementById('kpi-best-roas-month').textContent=DB.months[bestIdx];
 
-/* ── 4. Email Area Chart ── */
-const emailPairs = months.map((m,i) => ({m, e: emailList[i]})).filter(p => p.e > 0);
+  // Avg traffic paid era (index 6 = Jul 2024 onwards)
+  const pt=DB.traffic.slice(6).filter(v=>v>0);
+  document.getElementById('kpi-avg-traffic').textContent=Math.round(pt.reduce((s,v)=>s+v,0)/pt.length).toLocaleString();
 
-new Chart(document.getElementById('emailChart'), {
-  type: 'line',
-  data: {
-    labels: emailPairs.map(p => p.m),
-    datasets: [{
-      data: emailPairs.map(p => p.e),
-      borderColor: BLUE, borderWidth: 2, pointRadius: 0,
-      tension: 0.35, fill: true,
-      backgroundColor: (ctx) => {
-        const g = ctx.chart.ctx.createLinearGradient(0,0,0,200);
-        g.addColorStop(0, 'rgba(56,121,165,0.18)');
-        g.addColorStop(1, 'rgba(56,121,165,0.0)');
-        return g;
-      }
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        ...tooltipDefaults,
-        callbacks: { label: ctx => `  Subscribers: ${ctx.raw.toLocaleString()}` }
-      }
-    },
-    scales: {
-      x: { ...axisDefaults, ticks: { ...axisDefaults.ticks, maxRotation: 45, minRotation: 30 } },
-      y: { ...axisDefaults }
-    }
-  }
-});
+  // Avg AOV
+  const av=DB.aov.filter(v=>v>0);
+  const avgAov=av.reduce((s,v)=>s+v,0)/av.length;
+  document.getElementById('kpi-avg-aov').textContent='$'+avgAov.toFixed(2);
+  document.getElementById('aov-avg').textContent='$'+avgAov.toFixed(2);
 
-/* ── 5. CVR + AOV Dual Axis ── */
-const cvrPairs = months.map((m,i) => ({m, c: cvr[i], a: aov[i]})).filter(p => p.c > 0);
+  // Email
+  const lastEmail=[...DB.email].reverse().find(v=>v>0)||0;
+  const lastEmailIdx=DB.email.lastIndexOf(lastEmail);
+  const lastGrowth=DB.emailGrowth[lastEmailIdx];
+  document.getElementById('kpi-email').textContent=lastEmail.toLocaleString();
+  document.getElementById('kpi-email-sub').textContent=`+${lastGrowth} in ${DB.months[lastEmailIdx]}`;
+  document.getElementById('email-total').textContent=lastEmail.toLocaleString();
+  document.getElementById('email-sub').textContent=`total subscribers, ${DB.months[lastEmailIdx]}`;
+  const avgGrowth=Math.round(DB.emailGrowth.filter(v=>v>0).reduce((s,v)=>s+v,0)/DB.emailGrowth.filter(v=>v>0).length);
+  document.getElementById('email-growth-pill').textContent=`+${avgGrowth}/mo avg`;
 
-new Chart(document.getElementById('cvrChart'), {
-  type: 'line',
-  data: {
-    labels: cvrPairs.map(p => p.m),
-    datasets: [
-      {
-        label: 'CVR %',
-        data: cvrPairs.map(p => p.c),
-        borderColor: BLUE, borderWidth: 2,
-        pointRadius: 3, pointBackgroundColor: BLUE,
-        tension: 0.3, yAxisID: 'yCvr',
-      },
-      {
-        label: 'AOV $',
-        data: cvrPairs.map(p => p.a),
-        borderColor: GREY, borderWidth: 2,
-        pointRadius: 0, tension: 0.3,
-        yAxisID: 'yAov', borderDash: [4,3],
-      }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        ...tooltipDefaults,
-        callbacks: {
-          label: ctx => ctx.datasetIndex === 0
-            ? `  CVR: ${ctx.raw.toFixed(2)}%`
-            : `  AOV: $${ctx.raw.toFixed(2)}`
-        }
-      },
-      legend: { display: true, position: 'bottom', labels: { boxWidth: 24, padding: 12, color: MUTED, font: { size: 11 } } }
-    },
-    scales: {
-      x: { ...axisDefaults, ticks: { ...axisDefaults.ticks, maxRotation: 45, minRotation: 30 } },
-      yCvr: {
-        ...axisDefaults, position: 'left',
-        ticks: { ...axisDefaults.ticks, callback: v => `${v}%` }
-      },
-      yAov: {
-        ...axisDefaults, position: 'right',
-        grid: { display: false },
-        ticks: { ...axisDefaults.ticks, callback: v => `$${v}` }
+  // Avg ROAS
+  const avgRoas=rAll.reduce((s,v)=>s+v,0)/rAll.length;
+  document.getElementById('kpi-avg-roas').textContent=avgRoas.toFixed(2)+'×';
+
+  // Revenue totals
+  const r25=DB.months.map((m,i)=>m.includes("'25")?DB.revenue[i]:0).reduce((s,v)=>s+v,0);
+  const r24=DB.months.map((m,i)=>m.includes("'24")?DB.revenue[i]:0).reduce((s,v)=>s+v,0);
+  document.getElementById('rev-2025-ytd').textContent='$'+r25.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('rev-2024-total').textContent='$'+r24.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Latest traffic
+  const latestTrafficIdx=[...DB.traffic].map((v,i)=>({v,i})).filter(x=>x.v>0).reverse()[0]?.i??0;
+  document.getElementById('traffic-latest').textContent=DB.traffic[latestTrafficIdx].toLocaleString();
+  document.getElementById('traffic-latest-month').textContent=`sessions, ${DB.months[latestTrafficIdx]}`;
+
+  // Latest ROAS
+  const latestRoasIdx=DB.roas.map((v,i)=>({v,i})).filter(x=>x.v!==null).reverse()[0]?.i??0;
+  document.getElementById('roas-latest').textContent=DB.roas[latestRoasIdx].toFixed(2)+'×';
+  document.getElementById('roas-latest-month').textContent=DB.months[latestRoasIdx];
+
+  // Meta spend YTD 2025
+  const m25=DB.months.map((m,i)=>m.includes("'25")?DB.meta[i]:0).reduce((s,v)=>s+v,0);
+  document.getElementById('meta-spend-ytd').textContent='$'+m25.toLocaleString();
+
+  // CVR avg (paid era)
+  const cvrPaid=DB.cvr.slice(6).filter(v=>v>0);
+  const avgCvr=cvrPaid.reduce((s,v)=>s+v,0)/cvrPaid.length;
+  document.getElementById('cvr-avg').textContent=avgCvr.toFixed(2)+'%';
+
+  // Purchases
+  const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
+  const bestPurch=Math.max(...DB.purchases);
+  const bestPurchIdx=DB.purchases.indexOf(bestPurch);
+  document.getElementById('purchases-total').textContent=totalPurch+' orders';
+  document.getElementById('purchases-best').textContent=bestPurch+' orders';
+  document.getElementById('purchases-best-month').textContent=DB.months[bestPurchIdx];
+
+  // Header date
+  const last=DB.months[DB.months.length-1];
+  document.getElementById('data-through').textContent=`Data through ${last}`;
+  document.getElementById('page-sub').textContent=`${DB.months[0]} – ${last} · Space Water Canada`;
+}
+
+buildCharts();
+updateKPIs();
+
+/* ══ MODAL ══════════════════════════════════════════════════════════════════ */
+let uploadedFiles=[];
+function openModal(){document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');clearStatus();}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragging');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragging'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragging');handleFiles(e.dataTransfer.files);});
+
+function handleFiles(fl){
+  Array.from(fl).forEach(f=>{
+    if(['application/pdf','image/png','image/jpeg','image/jpg','text/csv'].includes(f.type)||f.name.endsWith('.csv'))
+      uploadedFiles.push(f);
+  });
+  renderFileList();
+}
+function renderFileList(){
+  document.getElementById('file-list').innerHTML=uploadedFiles.map((f,i)=>`
+    <div class="file-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${BLUE}" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="file-item-name">${f.name}</span>
+      <span class="file-item-size">${(f.size/1024).toFixed(0)}KB</span>
+      <button class="file-remove" onclick="removeFile(${i})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+}
+function removeFile(i){uploadedFiles.splice(i,1);renderFileList();}
+
+function setStatus(type,msg){
+  const icon=type==='success'
+    ?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>`
+    :`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  document.getElementById('status-msg').innerHTML=`<div class="status-msg ${type}">${icon}<span>${msg}</span></div>`;
+}
+function clearStatus(){document.getElementById('status-msg').innerHTML='';}
+
+async function parseReport(){
+  if(!uploadedFiles.length){setStatus('error','Please add at least one file.');return;}
+  const apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){setStatus('error','Please enter your Anthropic API key.');return;}
+
+  const btn=document.getElementById('parse-btn');
+  btn.disabled=true;
+  btn.innerHTML=`<div class="spinner"></div> Parsing with Claude…`;
+  clearStatus();
+
+  try{
+    const content=[];
+    for(const file of uploadedFiles){
+      const b64=await fileToBase64(file);
+      if(file.type==='application/pdf'){
+        content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}});
+      }else if(file.type.startsWith('image/')){
+        content.push({type:'image',source:{type:'base64',media_type:file.type,data:b64}});
+      }else{
+        content.push({type:'text',text:`CSV file "${file.name}":\n\n${await file.text()}`});
       }
     }
+
+    content.push({type:'text',text:`You are updating a marketing dashboard for Space Water (Canadian water brand).
+
+CURRENT DASHBOARD DATA (JSON — all arrays index-aligned to "months"):
+${JSON.stringify(DB,null,2)}
+
+From the uploaded report(s), extract any new or updated monthly marketing metrics.
+
+Rules:
+- Update existing months if new data is found for them.
+- If a genuinely new month is found (e.g. "May '25"), append it to ALL arrays in the same index position. Use null for roas if no paid ads, 0 for missing numeric values.
+- Month label format: "Jan '24", "Feb '25", etc.
+- revenue and aov = CAD dollar numbers (no $ sign, e.g. 1234.56)
+- cvr = percentage as a number (e.g. 0.85 means 0.85%, not 0.0085)
+- roas = number (e.g. 5.35) or null
+- meta = dollar amount spent (number)
+- email = total list size (cumulative number)
+- emailGrowth = net new subscribers that month
+- Keep all existing data unchanged if not mentioned in the report.
+
+Respond ONLY with valid JSON, no markdown, no explanation:
+{"updatedDB":{...complete updated DB...},"summary":"1-2 sentence summary of what changed"}`});
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content}]})
+    });
+
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`API error ${res.status}`);}
+
+    const data=await res.json();
+    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    if(parsed.updatedDB){
+      Object.assign(DB,parsed.updatedDB);
+      buildCharts();
+      updateKPIs();
+      setStatus('success',parsed.summary||'Dashboard updated successfully.');
+      uploadedFiles=[];
+      renderFileList();
+    }else{
+      throw new Error('Unexpected response format from Claude.');
+    }
+  }catch(err){
+    setStatus('error',err.message||'Something went wrong. Please try again.');
   }
-});
+
+  btn.disabled=false;
+  btn.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Parse & Update Dashboard`;
+}
+
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=()=>rej(new Error('Failed to read file'));
+    r.readAsDataURL(file);
+  });
+}
 </script>
 </body>
 </html>
