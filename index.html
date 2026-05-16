@@ -18,6 +18,9 @@
   --green:#4cad72;--green-pale:#f0faf5;--green-border:#b4dfc7;
   --red:#d9534f;--red-pale:#fff4f4;--red-border:#f5c0be;
   --amber:#d4880a;--amber-pale:#fef9ee;
+  --purple:#7c5cbf;--purple-pale:#f3f0fb;
+  --teal:#2a9d8f;--teal-pale:#f0faf8;
+  --rose:#c2415a;--rose-pale:#fdf0f3;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
@@ -72,6 +75,9 @@ header{
 .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .tab.special{color:var(--grey-dk)}
 .tab.special.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab.plan-tab{color:var(--purple)}
+.tab.plan-tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.tab-divider{width:1px;background:var(--border);margin:10px 4px;flex-shrink:0}
 
 /* ── MAIN ── */
 main{max-width:1200px;margin:0 auto;padding:32px 28px 80px}
@@ -79,6 +85,7 @@ main{max-width:1200px;margin:0 auto;padding:32px 28px 80px}
 /* ── VIEW HEADER ── */
 .view-header{margin-bottom:28px}
 .view-eyebrow{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.view-eyebrow.purple{color:var(--purple)}
 .view-title{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);color:var(--text);line-height:1.1}
 .view-sub{font-size:13px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .compare-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600}
@@ -163,15 +170,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .proj-scenario-btn{font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;padding:5px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;transition:all .18s}
 .proj-scenario-btn:hover,.proj-scenario-btn.active{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6);color:#fff}
 
-/* ── PROJECTION BANNER (static) ── */
-.projection{background:var(--blue);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:16px;margin-bottom:16px;border:none}
-@media(min-width:640px){.projection{flex-direction:row;align-items:center;justify-content:space-between}}
-.proj-amount{font-family:'DM Serif Display',serif;font-size:40px;color:#fff;line-height:1}
-.proj-sub{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
-.proj-stats{display:flex;gap:24px;flex-wrap:wrap}
-.proj-stat-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:3px}
-.proj-stat-val{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;line-height:1}
-
 /* ── MODAL ── */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(24,36,42,.45);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
 .modal-backdrop.open{display:flex}
@@ -213,6 +211,153 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .edit-field label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
 .edit-field input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none}
 .edit-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,121,165,.1)}
+
+/* ═══════════════════════════════════════════════════════════
+   ANNUAL PLANNER STYLES
+   ═══════════════════════════════════════════════════════════ */
+.planner-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;margin-bottom:20px;
+}
+.planner-btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.planner-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 13px;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text);cursor:pointer;transition:all .18s;
+}
+.planner-btn:hover{background:var(--surface2);border-color:var(--grey)}
+.planner-btn.purple{border-color:rgba(124,92,191,.3);color:var(--purple);background:var(--purple-pale)}
+.planner-btn.purple:hover{background:rgba(124,92,191,.15)}
+
+.planner-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+.planner-scroll::-webkit-scrollbar{height:4px}
+.planner-scroll::-webkit-scrollbar-thumb{background:var(--grey);border-radius:2px}
+
+.planner-table{border-collapse:collapse;min-width:100%;font-size:12px;font-family:'DM Sans',sans-serif}
+
+.planner-table thead th{
+  padding:0 10px;text-align:left;font-weight:600;
+  white-space:nowrap;border-bottom:1px solid var(--border);
+  border-right:1px solid rgba(190,195,198,.2);
+  background:var(--surface2);color:var(--muted);
+  letter-spacing:.04em;
+  position:sticky;top:0;z-index:3;
+}
+.planner-table thead tr:first-child th{
+  height:24px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+}
+.planner-table thead tr:nth-child(2) th{height:30px;font-size:11px}
+
+.planner-table th.row-col{
+  width:148px;min-width:148px;
+  position:sticky;left:0;z-index:4;
+  background:var(--surface2);border-right:2px solid rgba(190,195,198,.4) !important;
+}
+.planner-table thead tr:first-child th.row-col{background:var(--surface2)}
+
+.planner-table th.q1-h{background:rgba(56,121,165,.07);color:var(--blue)}
+.planner-table th.q2-h{background:rgba(44,157,143,.06);color:var(--teal)}
+.planner-table th.q3-h{background:rgba(212,136,10,.06);color:var(--amber)}
+.planner-table th.q4-h{background:rgba(194,65,90,.06);color:var(--rose)}
+
+.planner-table tbody td.row-label{
+  position:sticky;left:0;z-index:2;
+  background:var(--surface2);border-right:2px solid rgba(190,195,198,.4);
+  padding:0 10px;height:40px;
+  font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--grey-dk);white-space:nowrap;min-width:148px;
+  border-bottom:1px solid rgba(190,195,198,.2);
+  cursor:text;outline:none;
+  transition:background .15s;
+}
+.planner-table tbody td.row-label:focus{background:rgba(56,121,165,.07);color:var(--text)}
+.planner-table tbody tr.divider-above td{border-top:2px solid rgba(190,195,198,.4) !important}
+
+.planner-table tbody td.cell{
+  border-right:1px solid rgba(190,195,198,.15);
+  border-bottom:1px solid rgba(190,195,198,.15);
+  padding:4px 6px;min-width:96px;height:40px;
+  vertical-align:top;position:relative;
+}
+.planner-table tbody td.cell.q1{background:rgba(56,121,165,.025)}
+.planner-table tbody td.cell.q2{background:rgba(44,157,143,.02)}
+.planner-table tbody td.cell.q3{background:rgba(212,136,10,.02)}
+.planner-table tbody td.cell.q4{background:rgba(194,65,90,.02)}
+
+.cell-chips{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-start;padding-top:2px}
+
+.chip{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:20px;
+  font-size:10px;font-weight:600;white-space:nowrap;
+  cursor:default;line-height:1.4;
+}
+.chip-x{
+  background:none;border:none;cursor:pointer;
+  font-size:11px;line-height:1;color:inherit;opacity:.5;
+  padding:0 0 0 2px;
+}
+.chip-x:hover{opacity:1}
+.chip-usa{background:#ddeef8;color:#185fa5}
+.chip-cdn{background:#d9f0e8;color:#236b42}
+.chip-promo{background:#feeecb;color:#854f0b}
+.chip-nl{background:#e9e4f9;color:#5a3a9e}
+.chip-theme{background:#fde4eb;color:#8b1a35}
+.chip-blog{background:#e4f2f0;color:#0f6e56}
+.chip-event{background:#e8e3d8;color:#5a4a2a}
+.chip-contest{background:#f4e8f8;color:#6b2fa0}
+.chip-custom{background:var(--blue-pale);color:var(--blue-dark)}
+
+.cell-text-input{
+  width:100%;height:100%;background:transparent;border:none;
+  outline:none;font-size:11px;color:var(--text);
+  font-family:'DM Sans',sans-serif;padding:2px 2px;resize:none;
+  line-height:1.5;
+}
+.cell-text-input::placeholder{color:var(--grey)}
+.cell-text-input:focus{background:rgba(56,121,165,.05);border-radius:4px}
+
+.infl-cell{
+  display:flex;align-items:center;justify-content:center;
+  height:100%;
+}
+.infl-select{
+  background:transparent;border:none;outline:none;
+  font-size:12px;font-weight:600;color:var(--teal);
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+  width:100%;text-align:center;
+}
+
+.add-chip-trigger{
+  position:absolute;bottom:3px;right:4px;
+  background:none;border:none;cursor:pointer;
+  color:var(--grey);font-size:13px;line-height:1;
+  opacity:0;transition:opacity .15s;padding:2px;
+  border-radius:4px;
+}
+.add-chip-trigger:hover{color:var(--blue);background:var(--blue-pale)}
+td.cell:hover .add-chip-trigger{opacity:1}
+
+.planner-legend{
+  display:flex;flex-wrap:wrap;gap:10px;
+  margin-top:14px;padding:14px 16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;
+}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* add row modal */
+.row-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.row-type-opt{
+  border:1px solid var(--border);border-radius:8px;padding:10px 12px;
+  cursor:pointer;transition:all .18s;font-size:12px;font-weight:500;
+  display:flex;align-items:center;gap:6px;background:var(--surface);
+}
+.row-type-opt:hover{border-color:var(--blue);background:var(--blue-pale)}
+.row-type-opt.selected{border-color:var(--blue);background:var(--blue-pale);color:var(--blue)}
 
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)}
 
@@ -310,10 +455,51 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-t
   </div>
 </div>
 
+<!-- ADD ROW MODAL -->
+<div class="modal-backdrop" id="add-row-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">Add Row</div><div class="modal-sub">Choose a row type and give it a name.</div></div>
+      <button class="close-btn" onclick="closeAddRowModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="field-row">
+      <label class="field-label">Row name</label>
+      <input type="text" id="new-row-name" class="field-input" placeholder="e.g. Paid Social, Podcast..."/>
+    </div>
+    <label class="field-label" style="margin-bottom:8px;display:block">Row type</label>
+    <div class="row-type-grid" id="row-type-grid">
+      <div class="row-type-opt selected" data-type="chip-custom" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></span> Custom chips
+      </div>
+      <div class="row-type-opt" data-type="chip-usa" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:#185fa5;flex-shrink:0"></span> USA Events
+      </div>
+      <div class="row-type-opt" data-type="chip-cdn" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:#236b42;flex-shrink:0"></span> CDN Events
+      </div>
+      <div class="row-type-opt" data-type="chip-promo" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:#854f0b;flex-shrink:0"></span> Promotions
+      </div>
+      <div class="row-type-opt" data-type="chip-nl" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:#5a3a9e;flex-shrink:0"></span> Newsletter
+      </div>
+      <div class="row-type-opt" data-type="chip-theme" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:#8b1a35;flex-shrink:0"></span> Theme
+      </div>
+      <div class="row-type-opt" data-type="text" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--grey);flex-shrink:0"></span> Free text
+      </div>
+      <div class="row-type-opt" data-type="infl" onclick="selectRowType(this)">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--teal);flex-shrink:0"></span> Influencer ramp
+      </div>
+    </div>
+    <button class="action-btn" onclick="confirmAddRow()">Add Row</button>
+  </div>
+</div>
+
 <script>
 /* ══════════════════════════════════════════════════════════════════════
-   DATA — corrected years: was 2024/2025, actually 2025/2026
-   Jan 2025 → Apr 2026
+   DATA
    ══════════════════════════════════════════════════════════════════════ */
 const DB = {
   months:["Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"],
@@ -329,9 +515,60 @@ const DB = {
   emailGrowth:[0,0,175,-2,5,38,22,38,38,52,57,38,53,55,59,44],
 };
 
+/* ══════════════════════════════════════════════════════════════════════
+   ANNUAL PLAN DATA
+   ══════════════════════════════════════════════════════════════════════ */
+const PLAN_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const PLAN_Q = [0,0,0,1,1,1,2,2,2,3,3,3];
+const PLAN_QCL = ['q1','q2','q3','q4'];
+const PLAN_QNAMES = ['Q1','Q2','Q3','Q4'];
+const PLAN_INFL_OPTS = ['—','1/wk','2/wk','3/wk','4/wk','5/wk','6/wk','7/wk','8/wk','9/wk','10/wk','11/wk','12/wk'];
+
+// Plan rows: { label, type, chipClass, dividerAbove, data: {Jan:..., Feb:..., ...} }
+let PLAN_ROWS = [
+  {
+    label:'USA Events', type:'chip', chipClass:'chip-usa', dividerAbove:false,
+    data:{Jan:['Happy New Year'],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['4th of July','Prime Day'],Aug:[],Sep:['Labour Day'],Oct:[],Nov:['Black Friday'],Dec:[]}
+  },
+  {
+    label:'CDN Events', type:'chip', chipClass:'chip-cdn', dividerAbove:false,
+    data:{Jan:['Happy New Year'],Feb:["Valentine's Day",'Family Day'],Mar:["Int'l Women's Day"],Apr:['Easter','Earth Day'],May:["Mother's Day"],Jun:["Father's Day"],Jul:['BC Day','Pride'],Aug:[],Sep:['Labour Day','Equinox Sale'],Oct:['Halloween'],Nov:['Black Friday'],Dec:[]}
+  },
+  {
+    label:'Promotions', type:'chip', chipClass:'chip-promo', dividerAbove:false,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['10% off'],Oct:['10% off'],Nov:['25% off'],Dec:[]}
+  },
+  {
+    label:'Newsletter', type:'chip', chipClass:'chip-nl', dividerAbove:true,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Teaser','Launch','Last Call'],Oct:['Weekend Sale'],Nov:[],Dec:[]}
+  },
+  {
+    label:'Theme', type:'chip', chipClass:'chip-theme', dividerAbove:false,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['Pride'],Aug:[],Sep:[],Oct:[],Nov:['Black Friday'],Dec:[]}
+  },
+  {
+    label:'Blog', type:'chip', chipClass:'chip-blog', dividerAbove:false,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Xmas long lead'],Oct:['Xmas mid lead'],Nov:['Xmas bookings'],Dec:[]}
+  },
+  {
+    label:'Events / Partners', type:'chip', chipClass:'chip-event', dividerAbove:false,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]}
+  },
+  {
+    label:'Contests', type:'chip', chipClass:'chip-contest', dividerAbove:false,
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]}
+  },
+  {
+    label:'Influencers', type:'infl', chipClass:'', dividerAbove:true,
+    data:{Jan:'2/wk',Feb:'3/wk',Mar:'4/wk',Apr:'5/wk',May:'6/wk',Jun:'7/wk',Jul:'8/wk',Aug:'9/wk',Sep:'10/wk',Oct:'11/wk',Nov:'12/wk',Dec:'12/wk'}
+  },
+];
+
+let selectedRowType = 'chip-custom';
+
 /* ── State ── */
 const isClient = new URLSearchParams(window.location.search).get('view') === 'client';
-let currentTab = DB.months.length - 1; // always land on most recent month
+let currentTab = DB.months.length - 1;
 let editMode = false;
 let editModalIndex = null;
 let uploadedFiles = [];
@@ -352,7 +589,6 @@ function destroyCharts(){Object.values(CHARTS).forEach(c=>{try{c.destroy()}catch
    INIT
    ═══════════════════════════════════════════════════════════════════════ */
 function init(){
-  // Header visibility
   if(isClient){
     document.getElementById('client-badge').style.display='flex';
   } else {
@@ -372,15 +608,19 @@ function init(){
 function buildTabs(){
   const container = document.getElementById('tabs');
   let html = '';
-  // Special tabs first
   if(!isClient){
     html += `<button class="tab special ${currentTab==='all'?'active':''}" onclick="switchTab('all')">All Time</button>`;
     html += `<button class="tab special ${currentTab==='ytd'?'active':''}" onclick="switchTab('ytd')">YTD 2026</button>`;
-    html += `<div style="width:1px;background:var(--border);margin:10px 4px"></div>`;
+    html += `<div class="tab-divider"></div>`;
   }
   DB.months.forEach((m,i)=>{
     html += `<button class="tab ${currentTab===i?'active':''}" onclick="switchTab(${i})">${m}</button>`;
   });
+  html += `<div class="tab-divider"></div>`;
+  html += `<button class="tab plan-tab ${currentTab==='plan'?'active':''}" onclick="switchTab('plan')">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline;vertical-align:-1px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    2025 Annual Plan
+  </button>`;
   container.innerHTML = html;
 }
 
@@ -398,6 +638,7 @@ function renderView(){
   const container = document.getElementById('view-container');
   if(currentTab === 'all') renderAllTime(container);
   else if(currentTab === 'ytd') renderYTD(container);
+  else if(currentTab === 'plan') renderAnnualPlan(container);
   else renderMonth(container, currentTab);
 }
 
@@ -406,7 +647,7 @@ function fmt$(n,dec=0){if(!n&&n!==0)return '—';return '$'+n.toLocaleString('en
 function fmtN(n){if(!n&&n!==0)return '—';return n.toLocaleString();}
 function fmtPct(n,dec=2){if(!n&&n!==0)return '—';return n.toFixed(dec)+'%';}
 function fmtX(n){if(n===null||n===undefined)return '—';return n.toFixed(2)+'×';}
-function delta(curr,prev,isCurrency=false,isRev=false){
+function delta(curr,prev){
   if((!prev&&prev!==0)||prev===0||curr===null||prev===null)return null;
   const pct=((curr-prev)/Math.abs(prev)*100);
   const dir=pct>0?'up':pct<0?'down':'flat';
@@ -419,53 +660,252 @@ function deltaEl(curr,prev){
   if(!d)return '';
   return `<span class="kpi-delta ${d.dir}">${d.label}</span>`;
 }
-
-function kpiCard(label,val,sub,d,highlight=false,icon=''){
+function kpiCard(label,val,sub,d,highlight=false){
   return `<div class="card kpi ${highlight?'highlight':''}">
-    <div class="kpi-label">${icon}${label}</div>
+    <div class="kpi-label">${label}</div>
     <div><div class="kpi-value">${val}</div><div class="kpi-sub">${sub}</div>${d?`<div>${deltaEl(d.curr,d.prev)}</div>`:''}</div>
   </div>`;
 }
-
-function barColors(arr,highlightIdx=null){
-  return arr.map((_,i)=>i===highlightIdx?BLUE:'rgba(56,121,165,0.4)');
-}
-
+function barColors(arr,highlightIdx=null){return arr.map((_,i)=>i===highlightIdx?BLUE:'rgba(56,121,165,0.4)');}
 function mkBar(id,labels,data,yFmt,tooltipFmt,highlightIdx=null){
   const ctx=document.getElementById(id);if(!ctx)return;
-  CHARTS[id]=new Chart(ctx,{
-    type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:barColors(data,highlightIdx),borderRadius:4,borderSkipped:'bottom'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  ${tooltipFmt(c.raw)}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:yFmt}}}}
-  });
+  CHARTS[id]=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:barColors(data,highlightIdx),borderRadius:4,borderSkipped:'bottom'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT,callbacks:{label:c=>`  ${tooltipFmt(c.raw)}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:yFmt}}}}});
 }
 function mkLine(id,labels,datasets){
   const ctx=document.getElementById(id);if(!ctx)return;
-  CHARTS[id]=new Chart(ctx,{
-    type:'line',
-    data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:datasets.length>1,position:'bottom',labels:{boxWidth:20,padding:10,color:MUTED,font:{size:11}}},tooltip:{...TT,callbacks:{label:c=>`  ${c.dataset.label||''}: ${c.raw?.toLocaleString?.()??c.raw}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}}}}
-  });
+  CHARTS[id]=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:datasets.length>1,position:'bottom',labels:{boxWidth:20,padding:10,color:MUTED,font:{size:11}}},tooltip:{...TT,callbacks:{label:c=>`  ${c.dataset.label||''}: ${c.raw?.toLocaleString?.()??c.raw}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX,ticks:{...AX.ticks,callback:v=>v>=1000?`${(v/1000).toFixed(0)}k`:v}}}}});
 }
-function mkArea(id,labels,data,color=BLUE){
-  const ctx=document.getElementById(id);if(!ctx)return;
-  CHARTS[id]=new Chart(ctx,{
-    type:'line',
-    data:{labels,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,tension:0.35,fill:true,backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,190);g.addColorStop(0,color.replace(')',',0.15)').replace('rgb','rgba'));g.addColorStop(1,color.replace(')',',0)').replace('rgb','rgba'));return g;}}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX}}}
-  });
-}
-
-/* helper for gradient area with hex color */
 function hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `${r},${g},${b}`;}
 function mkAreaHex(id,labels,data,hex){
   const ctx=document.getElementById(id);if(!ctx)return;
   const rgb=hexToRgb(hex);
-  CHARTS[id]=new Chart(ctx,{
-    type:'line',
-    data:{labels,datasets:[{data,borderColor:hex,borderWidth:2,pointRadius:0,tension:0.35,fill:true,backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,190);g.addColorStop(0,`rgba(${rgb},0.15)`);g.addColorStop(1,`rgba(${rgb},0)`);return g;}}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX}}}
+  CHARTS[id]=new Chart(ctx,{type:'line',data:{labels,datasets:[{data,borderColor:hex,borderWidth:2,pointRadius:0,tension:0.35,fill:true,backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,190);g.addColorStop(0,`rgba(${rgb},0.15)`);g.addColorStop(1,`rgba(${rgb},0)`);return g;}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...TT}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},y:{...AX}}}});
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ANNUAL PLAN VIEW
+   ═══════════════════════════════════════════════════════════════════════ */
+function renderAnnualPlan(container){
+  container.innerHTML = `
+  <div class="view-header fade-up d1">
+    <div class="view-eyebrow purple">Marketing Calendar</div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <h1 class="view-title">2025 Annual Plan</h1>
+      <div class="planner-btn-group">
+        <button class="planner-btn" onclick="exportPlanCSV()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export CSV
+        </button>
+        <button class="planner-btn purple" onclick="openAddRowModal()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Row
+        </button>
+      </div>
+    </div>
+    <div class="view-sub">Click any cell to edit · Hover a cell to add entries · Row labels are editable</div>
+  </div>
+
+  <div class="card fade-up d2" style="padding:0;overflow:hidden;margin-bottom:16px">
+    <div class="planner-scroll">
+      <table class="planner-table" id="planner-table">
+        <thead id="planner-thead"></thead>
+        <tbody id="planner-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="planner-legend fade-up d3">
+    <span style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:4px">Key:</span>
+    <span class="leg"><span class="leg-dot" style="background:#185fa5"></span>USA event</span>
+    <span class="leg"><span class="leg-dot" style="background:#236b42"></span>CDN event</span>
+    <span class="leg"><span class="leg-dot" style="background:#854f0b"></span>Promo</span>
+    <span class="leg"><span class="leg-dot" style="background:#5a3a9e"></span>Newsletter</span>
+    <span class="leg"><span class="leg-dot" style="background:#8b1a35"></span>Theme</span>
+    <span class="leg"><span class="leg-dot" style="background:#0f6e56"></span>Blog</span>
+    <span class="leg"><span class="leg-dot" style="background:var(--teal)"></span>Influencer ramp</span>
+  </div>
+  `;
+
+  buildPlannerTable();
+}
+
+function buildPlannerTable(){
+  buildPlannerHead();
+  buildPlannerBody();
+}
+
+function buildPlannerHead(){
+  const thead = document.getElementById('planner-thead');
+  if(!thead) return;
+
+  // Q row
+  let qRow = `<tr><th class="row-col"></th>`;
+  const qCounts = [3,3,3,3];
+  qCounts.forEach((span,qi)=>{
+    qRow += `<th class="q${qi+1}-h" colspan="${span}" style="text-align:center;height:24px;font-size:10px;text-transform:uppercase;letter-spacing:.07em">${PLAN_QNAMES[qi]}</th>`;
   });
+  qRow += `</tr>`;
+
+  // Month row
+  let mRow = `<tr><th class="row-col" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Row</th>`;
+  PLAN_MONTHS.forEach((m,i)=>{
+    mRow += `<th class="q${PLAN_Q[i]+1}-h" style="text-align:left">${m}</th>`;
+  });
+  mRow += `</tr>`;
+
+  thead.innerHTML = qRow + mRow;
+}
+
+function buildPlannerBody(){
+  const tbody = document.getElementById('planner-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  PLAN_ROWS.forEach((row, rowIdx) => {
+    tbody.appendChild(buildPlanRow(row, rowIdx));
+  });
+}
+
+function buildPlanRow(row, rowIdx){
+  const tr = document.createElement('tr');
+  if(row.dividerAbove) tr.classList.add('divider-above');
+
+  // Label cell
+  const tdLabel = document.createElement('td');
+  tdLabel.className = 'row-label';
+  tdLabel.contentEditable = 'true';
+  tdLabel.textContent = row.label;
+  tdLabel.addEventListener('blur', e => { row.label = e.target.textContent.trim(); });
+  tr.appendChild(tdLabel);
+
+  // Month cells
+  PLAN_MONTHS.forEach((m, mi) => {
+    const td = document.createElement('td');
+    td.className = `cell ${PLAN_QCL[PLAN_Q[mi]]}`;
+
+    if(row.type === 'infl'){
+      const wrap = document.createElement('div');
+      wrap.className = 'infl-cell';
+      const sel = document.createElement('select');
+      sel.className = 'infl-select';
+      PLAN_INFL_OPTS.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o; opt.textContent = o;
+        if(o === row.data[m]) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', e => { row.data[m] = e.target.value; });
+      wrap.appendChild(sel);
+      td.appendChild(wrap);
+
+    } else if(row.type === 'text'){
+      const inp = document.createElement('textarea');
+      inp.className = 'cell-text-input';
+      inp.value = row.data[m] || '';
+      inp.placeholder = '…';
+      inp.rows = 1;
+      inp.addEventListener('change', e => { row.data[m] = e.target.value; });
+      td.appendChild(inp);
+
+    } else {
+      // chip row
+      const chipsWrap = document.createElement('div');
+      chipsWrap.className = 'cell-chips';
+
+      (row.data[m] || []).forEach((text, ci) => {
+        chipsWrap.appendChild(makeChip(text, row.chipClass, row, m, ci));
+      });
+      td.appendChild(chipsWrap);
+
+      // add button
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-chip-trigger';
+      addBtn.title = 'Add entry';
+      addBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+      addBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const val = prompt('Add entry:');
+        if(!val) return;
+        if(!Array.isArray(row.data[m])) row.data[m] = [];
+        row.data[m].push(val.trim());
+        const ci = row.data[m].length - 1;
+        chipsWrap.insertBefore(makeChip(val.trim(), row.chipClass, row, m, ci), addBtn.previousSibling ? null : chipsWrap.firstChild);
+      });
+      td.appendChild(addBtn);
+    }
+
+    tr.appendChild(td);
+  });
+
+  return tr;
+}
+
+function makeChip(text, chipClass, row, month, idx){
+  const span = document.createElement('span');
+  span.className = `chip ${chipClass}`;
+  span.innerHTML = `${text}<button class="chip-x" title="Remove">×</button>`;
+  span.querySelector('.chip-x').addEventListener('click', e => {
+    e.stopPropagation();
+    if(!Array.isArray(row.data[month])) return;
+    const i = row.data[month].indexOf(text);
+    if(i > -1) row.data[month].splice(i, 1);
+    span.remove();
+  });
+  return span;
+}
+
+/* ── Add Row Modal ── */
+function openAddRowModal(){
+  document.getElementById('new-row-name').value = '';
+  selectedRowType = 'chip-custom';
+  document.querySelectorAll('.row-type-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.type === 'chip-custom');
+  });
+  document.getElementById('add-row-modal').classList.add('open');
+}
+function closeAddRowModal(){ document.getElementById('add-row-modal').classList.remove('open'); }
+function selectRowType(el){
+  document.querySelectorAll('.row-type-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRowType = el.dataset.type;
+}
+function confirmAddRow(){
+  const name = document.getElementById('new-row-name').value.trim();
+  if(!name){ alert('Please enter a row name.'); return; }
+  const isInfl = selectedRowType === 'infl';
+  const isText = selectedRowType === 'text';
+  const newRow = {
+    label: name,
+    type: isInfl ? 'infl' : isText ? 'text' : 'chip',
+    chipClass: isInfl || isText ? '' : selectedRowType,
+    dividerAbove: false,
+    data: isInfl
+      ? Object.fromEntries(PLAN_MONTHS.map(m => [m,'—']))
+      : isText
+      ? Object.fromEntries(PLAN_MONTHS.map(m => [m,'']))
+      : Object.fromEntries(PLAN_MONTHS.map(m => [m,[]]))
+  };
+  PLAN_ROWS.push(newRow);
+  const tbody = document.getElementById('planner-tbody');
+  if(tbody) tbody.appendChild(buildPlanRow(newRow, PLAN_ROWS.length-1));
+  closeAddRowModal();
+}
+
+/* ── Export CSV ── */
+function exportPlanCSV(){
+  const rows = [['Row', ...PLAN_MONTHS]];
+  PLAN_ROWS.forEach(row => {
+    const vals = PLAN_MONTHS.map(m => {
+      const d = row.data[m];
+      if(Array.isArray(d)) return d.join(' · ');
+      return d || '';
+    });
+    rows.push([row.label, ...vals]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'space_water_2025_annual_plan.csv';
+  a.click();
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -475,7 +915,6 @@ function renderMonth(container,idx){
   const m=DB.months[idx];
   const prev=idx>0?idx-1:null;
   const pM=prev!==null?DB.months[prev]:null;
-
   const rev=DB.revenue[idx],pRev=prev!==null?DB.revenue[prev]:null;
   const tr=DB.traffic[idx],pTr=prev!==null?DB.traffic[prev]:null;
   const pur=DB.purchases[idx],pPur=prev!==null?DB.purchases[prev]:null;
@@ -485,14 +924,11 @@ function renderMonth(container,idx){
   const em=DB.email[idx],pEm=prev!==null?DB.email[prev]:null;
   const eg=DB.emailGrowth[idx];
   const mt=DB.meta[idx];
-
-  // sparkline: last 6 months of revenue ending at idx
   const sparkEnd=idx+1;
   const sparkStart=Math.max(0,sparkEnd-6);
   const sparkMonths=DB.months.slice(sparkStart,sparkEnd);
   const sparkRev=DB.revenue.slice(sparkStart,sparkEnd);
   const sparkTr=DB.traffic.slice(sparkStart,sparkEnd);
-
   const editBtnHtml = !isClient ? `<button class="header-btn" onclick="openEditModal(${idx})" style="margin-left:auto">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
     Edit ${m}
@@ -510,8 +946,6 @@ function renderMonth(container,idx){
       ${rev>0&&pRev>0?`<span class="compare-badge ${rev>=pRev?'up':'down'}">${rev>=pRev?'↑':'↓'} Revenue ${Math.abs(((rev-pRev)/pRev)*100).toFixed(1)}%</span>`:''}
     </div>
   </div>
-
-  <!-- KPIs -->
   <div class="kpi-grid fade-up d2">
     ${kpiCard('Revenue',rev>0?fmt$(rev,2):'No sales','total revenue',rev>0&&pRev>0?{curr:rev,prev:pRev}:null)}
     ${kpiCard('Orders',pur>0?fmtN(pur):'—','purchases',pur>0&&pPur>0?{curr:pur,prev:pPur}:null)}
@@ -520,8 +954,6 @@ function renderMonth(container,idx){
     ${kpiCard('Conversion',cv>0?fmtPct(cv):'—','conv. rate',cv>0&&pCv>0?{curr:cv,prev:pCv}:null)}
     ${kpiCard('ROAS',ro?fmtX(ro):'—',mt>0?`$${mt} meta spend`:'No paid ads',ro&&pRo?{curr:ro,prev:pRo}:null,ro&&ro>=5.7)}
   </div>
-
-  <!-- Email + Sparklines row -->
   <div class="chart-row c53 fade-up d3">
     <div class="card chart-card">
       <div class="chart-header">
@@ -537,8 +969,6 @@ function renderMonth(container,idx){
       <div class="chart-canvas-wrap"><canvas id="sparkEmailChart"></canvas></div>
     </div>
   </div>
-
-  <!-- Traffic spark -->
   <div class="chart-row fade-up d4" style="margin-bottom:16px">
     <div class="card chart-card">
       <div class="chart-header">
@@ -548,19 +978,13 @@ function renderMonth(container,idx){
       <div class="chart-canvas-wrap"><canvas id="sparkTrafficChart"></canvas></div>
     </div>
   </div>
-
-  <!-- Summary -->
   ${renderSummaryCard(idx,'month')}
-
-  <!-- Projector -->
   ${renderProjectorHTML()}
   `;
 
-  // Charts
   setTimeout(()=>{
     mkBar('sparkRevChart',sparkMonths,sparkRev,v=>`$${(v/1000).toFixed(0)}k`,v=>fmt$(v,2),sparkMonths.length-1);
-    const emailSlice=DB.email.slice(sparkStart,sparkEnd);
-    mkAreaHex('sparkEmailChart',sparkMonths,emailSlice,BLUE);
+    mkAreaHex('sparkEmailChart',sparkMonths,DB.email.slice(sparkStart,sparkEnd),BLUE);
     mkLine('sparkTrafficChart',sparkMonths,[
       {label:'Sessions',data:sparkTr,borderColor:BLUE,borderWidth:2,pointRadius:0,tension:0.35},
       {label:'Unique',data:DB.unique.slice(sparkStart,sparkEnd),borderColor:GREY,borderWidth:2,pointRadius:0,tension:0.35,borderDash:[4,3]}
@@ -581,7 +1005,6 @@ function renderYTD(container){
   const ytdTr=ytdIdx.map(i=>DB.traffic[i]);
   const ytdEm=ytdIdx.map(i=>DB.email[i]);
   const ytdRoas=ytdIdx.map(i=>DB.roas[i]).filter(v=>v!==null);
-
   const totalRev=ytdRev.reduce((s,v)=>s+v,0);
   const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
   const avgAov=ytdIdx.filter(i=>DB.aov[i]>0).map(i=>DB.aov[i]);
@@ -597,7 +1020,6 @@ function renderYTD(container){
     <h1 class="view-title">2026 Overview</h1>
     <div class="view-sub">Jan 2026 through ${DB.months[DB.months.length-1]}</div>
   </div>
-
   <div class="kpi-grid fade-up d2">
     ${kpiCard('Total Revenue',fmt$(totalRev,2),'2026 YTD',null)}
     ${kpiCard('Total Orders',fmtN(totalPurch),'purchases',null)}
@@ -606,7 +1028,6 @@ function renderYTD(container){
     ${kpiCard('Email List',fmtN(latestEmail),'current subscribers',null)}
     ${kpiCard('Avg ROAS',avgRoas?fmtX(avgRoas):'—','avg return on ad spend',null,avgRoas>=5)}
   </div>
-
   <div class="chart-row c53 fade-up d3">
     <div class="card chart-card">
       <div class="chart-header">
@@ -622,7 +1043,6 @@ function renderYTD(container){
       <div class="chart-canvas-wrap"><canvas id="ytdTrafficChart"></canvas></div>
     </div>
   </div>
-
   ${renderSummaryCard('ytd','ytd')}
   ${renderProjectorHTML()}
   `;
@@ -644,7 +1064,6 @@ function renderAllTime(container){
   const revVals=DB.revenue.filter(v=>v>0);
   const roasPairs=allMonths.map((m,i)=>({m,r:DB.roas[i]})).filter(p=>p.r!==null);
   const emailPairs=allMonths.map((m,i)=>({m,e:DB.email[i]})).filter(p=>p.e>0);
-
   const totalRev=DB.revenue.reduce((s,v)=>s+v,0);
   const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
   const avgAovVals=DB.aov.filter(v=>v>0);
@@ -662,7 +1081,6 @@ function renderAllTime(container){
     <h1 class="view-title">Overall Dashboard</h1>
     <div class="view-sub">${DB.months[0]} – ${DB.months[DB.months.length-1]} · ${DB.months.length} months on record</div>
   </div>
-
   <div class="kpi-grid fade-up d2">
     ${kpiCard('All-Time Revenue',fmt$(totalRev,2),'total revenue',null)}
     ${kpiCard('Best ROAS',fmtX(bestRoas),bestRoasMonth,null,true)}
@@ -671,7 +1089,6 @@ function renderAllTime(container){
     ${kpiCard('Email List',fmtN(latestEmail),'current subscribers',null)}
     ${kpiCard('Avg ROAS',fmtX(avgRoas),'since ads started',null)}
   </div>
-
   <div class="chart-row c53 fade-up d3">
     <div class="card chart-card">
       <div class="chart-header">
@@ -687,7 +1104,6 @@ function renderAllTime(container){
       <div class="chart-canvas-wrap"><canvas id="allRoasChart"></canvas></div>
     </div>
   </div>
-
   <div class="chart-row c2 fade-up d4">
     <div class="card chart-card">
       <div class="chart-header">
@@ -703,7 +1119,6 @@ function renderAllTime(container){
       <div class="chart-canvas-wrap"><canvas id="allEmailChart"></canvas></div>
     </div>
   </div>
-
   <div class="chart-row fade-up d5">
     <div class="card chart-card">
       <div class="chart-header">
@@ -713,14 +1128,12 @@ function renderAllTime(container){
       <div class="chart-canvas-wrap" style="height:170px"><canvas id="allCvrChart"></canvas></div>
     </div>
   </div>
-
   ${renderSummaryCard('all','all')}
   ${renderProjectorHTML()}
   `;
 
   setTimeout(()=>{
     mkBar('allRevChart',revMonths,revVals,v=>`$${(v/1000).toFixed(0)}k`,v=>fmt$(v,2));
-    // ROAS with avg line
     const rc=new Chart(document.getElementById('allRoasChart'),{
       type:'bar',
       data:{labels:roasPairs.map(p=>p.m),datasets:[{data:roasPairs.map(p=>p.r),backgroundColor:roasPairs.map(p=>p.r>=avgRoas?BLUE:'rgba(56,121,165,0.4)'),borderRadius:4,borderSkipped:'bottom'}]},
@@ -729,14 +1142,11 @@ function renderAllTime(container){
     CHARTS['allRoasChart']=rc;
     const origDraw=rc.draw.bind(rc);
     rc.draw=function(){origDraw();const ctx=rc.ctx,yS=rc.scales.y,xS=rc.scales.x,y=yS.getPixelForValue(avgRoas);ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle=GREY;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(xS.left,y);ctx.lineTo(xS.right,y);ctx.stroke();ctx.restore();ctx.fillStyle=MUTED;ctx.font='10px DM Sans,system-ui';ctx.fillText(`avg ${avgRoas.toFixed(2)}×`,xS.right-58,y-5);};
-
     mkLine('allTrafficChart',allMonths,[
       {label:'Sessions',data:DB.traffic,borderColor:BLUE,borderWidth:2,pointRadius:0,tension:0.35},
       {label:'Unique',data:DB.unique,borderColor:GREY,borderWidth:2,pointRadius:0,tension:0.35,borderDash:[4,3]}
     ]);
     mkAreaHex('allEmailChart',emailPairs.map(p=>p.m),emailPairs.map(p=>p.e),BLUE);
-
-    // CVR + AOV dual axis
     const cvrPairs=DB.months.map((m,i)=>({m,c:DB.cvr[i],a:DB.aov[i]})).filter(p=>p.c>0&&p.c<20);
     CHARTS['allCvrChart']=new Chart(document.getElementById('allCvrChart'),{
       type:'line',
@@ -746,7 +1156,6 @@ function renderAllTime(container){
       ]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:20,padding:10,color:MUTED,font:{size:11}}},tooltip:{...TT,callbacks:{label:c=>c.datasetIndex===0?`  CVR: ${c.raw.toFixed(2)}%`:`  AOV: $${c.raw.toFixed(2)}`}}},scales:{x:{...AX,ticks:{...AX.ticks,maxRotation:45,minRotation:30}},yCvr:{...AX,position:'left',ticks:{...AX.ticks,callback:v=>`${v}%`}},yAov:{...AX,position:'right',grid:{display:false},ticks:{...AX.ticks,callback:v=>`$${v}`}}}}
     });
-
     initProjector();
     initSummary('all','all');
   },50);
@@ -759,14 +1168,11 @@ function renderSummaryCard(idx,mode){
   const compareOptions = mode==='month' && idx>0
     ? DB.months.slice(0,idx).map((m,i)=>`<option value="${i}" ${i===idx-1?'selected':''}>${m}</option>`).join('')
     : '';
-
   return `<div class="card summary-card fade-up d6">
     <div class="summary-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">
       <div class="summary-title">Business Health Summary</div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        ${mode==='month'&&idx>0?`<select class="summary-compare-select" id="compare-select" onchange="updateSummaryCompare(${idx})">
-          ${compareOptions}
-        </select>`:''}
+        ${mode==='month'&&idx>0?`<select class="summary-compare-select" id="compare-select" onchange="updateSummaryCompare(${idx})">${compareOptions}</select>`:''}
         <button class="gen-btn" id="summary-gen-btn" onclick="generateSummary(${JSON.stringify(idx)}, '${mode}')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           Generate Summary
@@ -787,14 +1193,11 @@ async function generateSummary(idx,mode,compareIdx=null){
   const btn=document.getElementById('summary-gen-btn');
   const body=document.getElementById('summary-body');
   const apiKey=document.getElementById('api-key')?.value?.trim()||summaryApiKey;
-
   if(!apiKey){
-    // prompt for key
     const key=prompt('Enter your Anthropic API key to generate AI summaries:');
     if(!key)return;
     summaryApiKey=key;
   }
-
   btn.disabled=true;
   btn.innerHTML=`<div class="spinner"></div> Analyzing…`;
   body.className='summary-body loading';
@@ -806,16 +1209,10 @@ async function generateSummary(idx,mode,compareIdx=null){
   if(mode==='month'){
     const i=idx;
     const ci=compareIdx!==null?compareIdx:(i>0?i-1:null);
-    const m=DB.months[i];
-    const cm=ci!==null?DB.months[ci]:null;
+    const m=DB.months[i],cm=ci!==null?DB.months[ci]:null;
     const curr={revenue:DB.revenue[i],traffic:DB.traffic[i],purchases:DB.purchases[i],cvr:DB.cvr[i],aov:DB.aov[i],roas:DB.roas[i],meta:DB.meta[i],email:DB.email[i],emailGrowth:DB.emailGrowth[i]};
     const prev=ci!==null?{revenue:DB.revenue[ci],traffic:DB.traffic[ci],purchases:DB.purchases[ci],cvr:DB.cvr[ci],aov:DB.aov[ci],roas:DB.roas[ci],meta:DB.meta[ci],email:DB.email[ci],emailGrowth:DB.emailGrowth[ci]}:null;
-
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest, and friendly 3-4 sentence business health summary for ${m}.
-Data for ${m}: ${JSON.stringify(curr)}
-${prev?`Data for ${cm} (comparison): ${JSON.stringify(prev)}`:'No prior month to compare.'}
-Focus on: revenue health, traffic quality, ROAS efficiency, email growth. Be specific with numbers. Mention notable wins and areas to watch. Don't use bullet points — write flowing prose. Keep it direct and useful for a business owner.`;
-
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest, and friendly 3-4 sentence business health summary for ${m}.\nData for ${m}: ${JSON.stringify(curr)}\n${prev?`Data for ${cm} (comparison): ${JSON.stringify(prev)}`:'No prior month to compare.'}\nFocus on: revenue health, traffic quality, ROAS efficiency, email growth. Be specific with numbers. Mention notable wins and areas to watch. Don't use bullet points — write flowing prose. Keep it direct and useful for a business owner.`;
     if(prev){
       const revDelta=prev.revenue>0?((curr.revenue-prev.revenue)/prev.revenue*100).toFixed(1):null;
       const trDelta=prev.traffic>0?((curr.traffic-prev.traffic)/prev.traffic*100).toFixed(1):null;
@@ -832,20 +1229,14 @@ Focus on: revenue health, traffic quality, ROAS efficiency, email growth. Be spe
     const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
     const totalTraffic=ytdIdx.reduce((s,i)=>s+DB.traffic[i],0);
     const avgRoas=DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).reduce((s,v)=>s+v,0)/DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).length;
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.
-2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.
-All-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.
-Be honest about trajectory — is the business growing, flat, or declining? Mention what's working and what needs attention. Write in flowing prose, no bullets.`;
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
   } else {
     const totalRev=DB.revenue.reduce((s,v)=>s+v,0);
     const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
     const roasVals=DB.roas.filter(v=>v!==null);
     const avgRoas=roasVals.reduce((s,v)=>s+v,0)/roasVals.length;
     const latestEmail=DB.email.filter(v=>v>0).pop()||0;
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 4-5 sentence all-time business health summary.
-All-time data (${DB.months[0]} to ${DB.months[DB.months.length-1]}): Total revenue $${totalRev.toFixed(2)}, Total orders ${totalPurch}, Avg ROAS ${avgRoas.toFixed(2)}, Current email list ${latestEmail} subscribers.
-Monthly breakdown: ${DB.months.map((m,i)=>DB.revenue[i]>0?`${m}: $${DB.revenue[i]}`:'').filter(Boolean).join(', ')}.
-Assess overall business health: revenue trend, ad efficiency, email growth trajectory, and what the data suggests for the future. Be direct and useful. No bullets.`;
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 4-5 sentence all-time business health summary.\nAll-time data (${DB.months[0]} to ${DB.months[DB.months.length-1]}): Total revenue $${totalRev.toFixed(2)}, Total orders ${totalPurch}, Avg ROAS ${avgRoas.toFixed(2)}, Email list ${latestEmail} subscribers.\nMonthly revenue: ${DB.months.map((m,i)=>DB.revenue[i]>0?`${m}: $${DB.revenue[i]}`:'').filter(Boolean).join(', ')}.\nAssess overall health: revenue trend, ad efficiency, email growth, future outlook. Direct and useful. No bullets.`;
   }
 
   try{
@@ -869,18 +1260,16 @@ Assess overall business health: revenue trend, ad efficiency, email growth traje
     body.className='summary-body';
     body.textContent='Could not generate summary. Please check your API key and try again.';
   }
-
   btn.disabled=false;
   btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Regenerate`;
 }
 
 function initSummary(idx,mode){
-  // auto-generate if api key already stored
   if(summaryApiKey) generateSummary(idx,mode);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   AD SPEND PROJECTOR
+   PROJECTOR
    ═══════════════════════════════════════════════════════════════════════ */
 function renderProjectorHTML(){
   return `<div class="projector-card card fade-up d7">
@@ -921,7 +1310,6 @@ function renderProjectorHTML(){
 }
 
 function initProjector(){updateProjector();}
-
 function updateProjector(){
   const spend=parseFloat(document.getElementById('proj-spend')?.value||600);
   const roas=parseFloat(document.getElementById('proj-roas')?.value||5.7);
@@ -936,7 +1324,6 @@ function updateProjector(){
   if(document.getElementById('proj-roas-lbl')) document.getElementById('proj-roas-lbl').textContent=roas.toFixed(2)+'×';
   if(document.getElementById('proj-aov-lbl')) document.getElementById('proj-aov-lbl').textContent='$'+aov;
 }
-
 function setScenario(spend,roas,aov){
   const s=document.getElementById('proj-spend'),r=document.getElementById('proj-roas'),a=document.getElementById('proj-aov');
   if(s)s.value=spend;if(r)r.value=roas;if(a)a.value=aov;
@@ -970,9 +1357,7 @@ function openEditModal(idx){
     </div>`).join('');
   document.getElementById('edit-modal').classList.add('open');
 }
-
 function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');}
-
 function saveEditModal(){
   const idx=editModalIndex;
   const keys=['traffic','unique','purchases','revenue','aov','cvr','roas','meta','email','emailGrowth'];
@@ -987,7 +1372,7 @@ function saveEditModal(){
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   EDIT MODE TOGGLE (legacy inline)
+   EDIT MODE TOGGLE
    ═══════════════════════════════════════════════════════════════════════ */
 function toggleEditMode(){
   editMode=!editMode;
@@ -995,13 +1380,11 @@ function toggleEditMode(){
   if(editMode){
     document.body.classList.add('edit-mode');
     btn.textContent='Exit Edit Mode';
-    btn.classList.remove('active');
-    btn.classList.add('primary');
+    btn.classList.remove('active');btn.classList.add('primary');
   } else {
     document.body.classList.remove('edit-mode');
     btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Mode`;
-    btn.classList.remove('primary');
-    btn.classList.add('active');
+    btn.classList.remove('primary');btn.classList.add('active');
   }
 }
 
@@ -1012,6 +1395,7 @@ function openUploadModal(){document.getElementById('upload-modal').classList.add
 function closeUploadModal(){document.getElementById('upload-modal').classList.remove('open');}
 document.getElementById('upload-modal').addEventListener('click',e=>{if(e.target===document.getElementById('upload-modal'))closeUploadModal();});
 document.getElementById('edit-modal').addEventListener('click',e=>{if(e.target===document.getElementById('edit-modal'))closeEditModal();});
+document.getElementById('add-row-modal').addEventListener('click',e=>{if(e.target===document.getElementById('add-row-modal'))closeAddRowModal();});
 
 const dz=document.getElementById('drop-zone');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragging');});
@@ -1034,20 +1418,15 @@ function renderFileList(){
     </div>`).join('');
 }
 function removeFile(i){uploadedFiles.splice(i,1);renderFileList();}
-
-function setUploadStatus(type,msg){
-  document.getElementById('upload-status').innerHTML=`<div class="status-msg ${type}"><span>${msg}</span></div>`;
-}
+function setUploadStatus(type,msg){document.getElementById('upload-status').innerHTML=`<div class="status-msg ${type}"><span>${msg}</span></div>`;}
 
 async function parseReport(){
   if(!uploadedFiles.length){setUploadStatus('error','Please add at least one file.');return;}
   const apiKey=document.getElementById('api-key').value.trim();
   if(!apiKey){setUploadStatus('error','Please enter your Anthropic API key.');return;}
   summaryApiKey=apiKey;
-
   const btn=document.getElementById('parse-btn');
   btn.disabled=true;btn.innerHTML=`<div class="spinner"></div> Parsing with Claude…`;
-
   try{
     const content=[];
     for(const file of uploadedFiles){
@@ -1056,22 +1435,7 @@ async function parseReport(){
       else if(file.type.startsWith('image/')){content.push({type:'image',source:{type:'base64',media_type:file.type,data:b64}});}
       else{content.push({type:'text',text:`CSV: "${file.name}":\n\n${await file.text()}`});}
     }
-    content.push({type:'text',text:`Update the Space Water marketing dashboard DB object.
-
-CURRENT DB (JSON, all arrays index-aligned to "months"):
-${JSON.stringify(DB,null,2)}
-
-From the uploaded report(s), extract new/updated monthly data.
-Rules:
-- Update existing months with new data found.
-- New months (e.g. "May '26"): append to ALL arrays. Use null for roas if no ads, 0 for missing numbers.
-- Month format: "Jan '25", "Feb '26" etc.
-- revenue/aov = CAD numbers (no $). cvr = percentage number (e.g. 0.85). roas = number or null.
-- Preserve all existing unchanged data.
-
-Respond ONLY with valid JSON, no markdown:
-{"updatedDB":{...complete DB...},"summary":"what changed"}`});
-
+    content.push({type:'text',text:`Update the Space Water marketing dashboard DB object.\n\nCURRENT DB (JSON):\n${JSON.stringify(DB,null,2)}\n\nFrom the uploaded report(s), extract new/updated monthly data.\nRules:\n- Update existing months with new data.\n- New months: append to ALL arrays. Use null for roas if no ads, 0 for missing.\n- Month format: "Jan '25", "Feb '26" etc.\n- revenue/aov = CAD numbers. cvr = percentage number. roas = number or null.\n- Preserve all existing unchanged data.\n\nRespond ONLY with valid JSON, no markdown:\n{"updatedDB":{...complete DB...},"summary":"what changed"}`});
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
@@ -1088,7 +1452,6 @@ Respond ONLY with valid JSON, no markdown:
       uploadedFiles=[];renderFileList();
     }
   }catch(err){setUploadStatus('error',err.message||'Something went wrong.');}
-
   btn.disabled=false;btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Parse &amp; Update Dashboard`;
 }
 
@@ -1097,49 +1460,26 @@ function fileToBase64(file){
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   EXPORT — rewrites the DB const in the file and downloads index.html
+   EXPORT
    ═══════════════════════════════════════════════════════════════════════ */
 function exportDashboard(){
-  const btn = document.getElementById('export-btn');
-  btn.innerHTML = `<div class="spinner" style="border-color:rgba(56,121,165,0.3);border-top-color:var(--blue)"></div> Saving…`;
-  btn.disabled = true;
-
-  // Fetch the current HTML source from the server
-  fetch(window.location.pathname + window.location.search)
-    .then(r => r.text())
-    .then(html => {
-      // Build the new DB block as a clean string
-      const newDBString = `const DB = ${JSON.stringify(DB, null, 2)};`;
-
-      // Replace everything between "const DB = {" and the closing "};" of the DB object
-      // We match the original DB declaration using a regex that captures the full block
-      const updated = html.replace(
-        /const DB = \{[\s\S]*?\n\};/,
-        newDBString
-      );
-
-      // Download
-      const blob = new Blob([updated], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'index.html';
-      a.click();
-      URL.revokeObjectURL(url);
-
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved!`;
-      setTimeout(()=>{
-        btn.disabled = false;
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;
-      }, 2500);
-    })
-    .catch(()=>{
-      // Fallback: if fetch of self fails (e.g. file:// protocol), build from scratch isn't feasible
-      // so we just alert the user
-      alert('Export failed — this can happen if you opened the file directly from your desktop.\n\nTo use Export, view the dashboard from your Vercel URL instead.');
-      btn.disabled = false;
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;
-    });
+  const btn=document.getElementById('export-btn');
+  btn.innerHTML=`<div class="spinner" style="border-color:rgba(56,121,165,0.3);border-top-color:var(--blue)"></div> Saving…`;
+  btn.disabled=true;
+  fetch(window.location.pathname+window.location.search).then(r=>r.text()).then(html=>{
+    const newDBString=`const DB = ${JSON.stringify(DB,null,2)};`;
+    const updated=html.replace(/const DB = \{[\s\S]*?\n\};/,newDBString);
+    const blob=new Blob([updated],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='index.html';a.click();
+    URL.revokeObjectURL(url);
+    btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved!`;
+    setTimeout(()=>{btn.disabled=false;btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;},2500);
+  }).catch(()=>{
+    alert('Export failed — view the dashboard from your Vercel URL instead.');
+    btn.disabled=false;btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;
+  });
 }
 
 /* ── Go ── */
