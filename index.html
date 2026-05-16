@@ -25,7 +25,7 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--grey);border-radius:4px}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--surface2);border-radius:4px}::-webkit-scrollbar-thumb{background:var(--grey);border-radius:4px;border:2px solid var(--surface2)}::-webkit-scrollbar-thumb:hover{background:var(--grey-dk)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -232,8 +232,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .planner-btn.purple:hover{background:rgba(124,92,191,.15)}
 
 .planner-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
-.planner-scroll::-webkit-scrollbar{height:4px}
-.planner-scroll::-webkit-scrollbar-thumb{background:var(--grey);border-radius:2px}
+.planner-scroll::-webkit-scrollbar{height:10px}
+.planner-scroll::-webkit-scrollbar-track{background:var(--surface2);border-radius:5px;margin:0 2px}
+.planner-scroll::-webkit-scrollbar-thumb{background:var(--grey);border-radius:5px;border:2px solid var(--surface2)}
+.planner-scroll::-webkit-scrollbar-thumb:hover{background:var(--grey-dk)}
 
 .planner-table{border-collapse:collapse;min-width:100%;font-size:12px;font-family:'DM Sans',sans-serif}
 
@@ -358,6 +360,45 @@ td.cell:hover .add-chip-trigger{opacity:1}
 }
 .row-type-opt:hover{border-color:var(--blue);background:var(--blue-pale)}
 .row-type-opt.selected{border-color:var(--blue);background:var(--blue-pale);color:var(--blue)}
+/* ── WEEK DRILL-DOWN ── */
+@keyframes expandDown{from{opacity:0;transform:scaleY(0.94);transform-origin:top}to{opacity:1;transform:scaleY(1);transform-origin:top}}
+
+.planner-table th.month-h{
+  cursor:pointer;user-select:none;transition:background .15s;position:relative;
+}
+.planner-table th.month-h:hover{filter:brightness(0.94)}
+.month-expand-icon{font-size:9px;color:var(--blue);opacity:.65;margin-left:4px;display:inline-block;transition:transform .2s}
+.month-h.expanded .month-expand-icon{transform:rotate(180deg)}
+
+.planner-table th.week-h{
+  background:rgba(56,121,165,.04);color:var(--muted);
+  font-size:10px;font-weight:500;letter-spacing:.02em;
+  min-width:72px;border-right:1px solid rgba(190,195,198,.12);
+  line-height:1.3;
+}
+.planner-table th.week-h.wk-last{border-right:2px solid rgba(190,195,198,.35)}
+
+.planner-table tbody td.week-cell{
+  border-right:1px solid rgba(190,195,198,.1);
+  border-bottom:1px solid rgba(190,195,198,.15);
+  padding:3px 5px;min-width:76px;height:40px;
+  vertical-align:top;position:relative;
+  background:rgba(56,121,165,.012);
+  animation:expandDown .18s ease;
+}
+.planner-table tbody td.week-cell.wk-last{border-right:2px solid rgba(190,195,198,.35)}
+.planner-table tbody td.week-cell.infl-wk{background:var(--surface2)}
+
+.planner-table th.month-col-end,
+.planner-table td.month-col-end{border-right:2px solid rgba(190,195,198,.35) !important}
+
+.week-hint{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--muted);
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;padding:4px 10px;margin-top:2px;
+}
+
 
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)}
 
@@ -593,41 +634,70 @@ const PLAN_INFL_OPTS = ['—','1/wk','2/wk','3/wk','4/wk','5/wk','6/wk','7/wk','
 let PLAN_ROWS = [
   {
     label:'USA Events', type:'chip', chipClass:'chip-usa', dividerAbove:false,
-    data:{Jan:['Happy New Year'],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['4th of July','Prime Day'],Aug:[],Sep:['Labour Day'],Oct:[],Nov:['Black Friday'],Dec:[]}
+    data:{Jan:['Happy New Year'],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['4th of July','Prime Day'],Aug:[],Sep:['Labour Day'],Oct:[],Nov:['Black Friday'],Dec:[]},
+    weekData:{}
   },
   {
     label:'CDN Events', type:'chip', chipClass:'chip-cdn', dividerAbove:false,
-    data:{Jan:['Happy New Year'],Feb:["Valentine's Day",'Family Day'],Mar:["Int'l Women's Day"],Apr:['Easter','Earth Day'],May:["Mother's Day"],Jun:["Father's Day"],Jul:['BC Day','Pride'],Aug:[],Sep:['Labour Day','Equinox Sale'],Oct:['Halloween'],Nov:['Black Friday'],Dec:[]}
+    data:{Jan:['Happy New Year'],Feb:["Valentine's Day",'Family Day'],Mar:["Int'l Women's Day"],Apr:['Easter','Earth Day'],May:["Mother's Day"],Jun:["Father's Day"],Jul:['BC Day','Pride'],Aug:[],Sep:['Labour Day','Equinox Sale'],Oct:['Halloween'],Nov:['Black Friday'],Dec:[]},
+    weekData:{}
   },
   {
     label:'Promotions', type:'chip', chipClass:'chip-promo', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['10% off'],Oct:['10% off'],Nov:['25% off'],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['10% off'],Oct:['10% off'],Nov:['25% off'],Dec:[]},
+    weekData:{}
   },
   {
     label:'Newsletter', type:'chip', chipClass:'chip-nl', dividerAbove:true,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Teaser','Launch','Last Call'],Oct:['Weekend Sale'],Nov:[],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Teaser','Launch','Last Call'],Oct:['Weekend Sale'],Nov:[],Dec:[]},
+    weekData:{}
   },
   {
     label:'Theme', type:'chip', chipClass:'chip-theme', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['Pride'],Aug:[],Sep:[],Oct:[],Nov:['Black Friday'],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['Pride'],Aug:[],Sep:[],Oct:[],Nov:['Black Friday'],Dec:[]},
+    weekData:{}
   },
   {
     label:'Blog', type:'chip', chipClass:'chip-blog', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Xmas long lead'],Oct:['Xmas mid lead'],Nov:['Xmas bookings'],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Xmas long lead'],Oct:['Xmas mid lead'],Nov:['Xmas bookings'],Dec:[]},
+    weekData:{}
   },
   {
     label:'Events / Partners', type:'chip', chipClass:'chip-event', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
+    weekData:{}
   },
   {
     label:'Contests', type:'chip', chipClass:'chip-contest', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]}
+    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
+    weekData:{}
   },
   {
     label:'Influencers', type:'infl', chipClass:'', dividerAbove:true,
-    data:{Jan:'2/wk',Feb:'3/wk',Mar:'4/wk',Apr:'5/wk',May:'6/wk',Jun:'7/wk',Jul:'8/wk',Aug:'9/wk',Sep:'10/wk',Oct:'11/wk',Nov:'12/wk',Dec:'12/wk'}
+    data:{Jan:'2/wk',Feb:'3/wk',Mar:'4/wk',Apr:'5/wk',May:'6/wk',Jun:'7/wk',Jul:'8/wk',Aug:'9/wk',Sep:'10/wk',Oct:'11/wk',Nov:'12/wk',Dec:'12/wk'},
+    weekData:{}
   },
 ];
+
+
+// Weeks per month (2025 calendar)
+const MONTH_WEEKS = {
+  Jan:[['W1','Jan 1–5'],  ['W2','Jan 6–12'],  ['W3','Jan 13–19'], ['W4','Jan 20–26'], ['W5','Jan 27–31']],
+  Feb:[['W1','Feb 1–2'],  ['W2','Feb 3–9'],   ['W3','Feb 10–16'], ['W4','Feb 17–23'], ['W5','Feb 24–28']],
+  Mar:[['W1','Mar 1–2'],  ['W2','Mar 3–9'],   ['W3','Mar 10–16'], ['W4','Mar 17–23'], ['W5','Mar 24–31']],
+  Apr:[['W1','Apr 1–6'],  ['W2','Apr 7–13'],  ['W3','Apr 14–20'], ['W4','Apr 21–27'], ['W5','Apr 28–30']],
+  May:[['W1','May 1–4'],  ['W2','May 5–11'],  ['W3','May 12–18'], ['W4','May 19–25'], ['W5','May 26–31']],
+  Jun:[['W1','Jun 1–1'],  ['W2','Jun 2–8'],   ['W3','Jun 9–15'],  ['W4','Jun 16–22'], ['W5','Jun 23–30']],
+  Jul:[['W1','Jul 1–6'],  ['W2','Jul 7–13'],  ['W3','Jul 14–20'], ['W4','Jul 21–27'], ['W5','Jul 28–31']],
+  Aug:[['W1','Aug 1–3'],  ['W2','Aug 4–10'],  ['W3','Aug 11–17'], ['W4','Aug 18–24'], ['W5','Aug 25–31']],
+  Sep:[['W1','Sep 1–7'],  ['W2','Sep 8–14'],  ['W3','Sep 15–21'], ['W4','Sep 22–28'], ['W5','Sep 29–30']],
+  Oct:[['W1','Oct 1–5'],  ['W2','Oct 6–12'],  ['W3','Oct 13–19'], ['W4','Oct 20–26'], ['W5','Oct 27–31']],
+  Nov:[['W1','Nov 1–2'],  ['W2','Nov 3–9'],   ['W3','Nov 10–16'], ['W4','Nov 17–23'], ['W5','Nov 24–30']],
+  Dec:[['W1','Dec 1–7'],  ['W2','Dec 8–14'],  ['W3','Dec 15–21'], ['W4','Dec 22–28'], ['W5','Dec 29–31']],
+};
+
+// Track which months are expanded
+let expandedMonths = new Set();
 
 let selectedRowType = 'chip-custom';
 
@@ -768,7 +838,13 @@ function renderAnnualPlan(container){
         </button>
       </div>
     </div>
-    <div class="view-sub">Click any cell to edit · Hover a cell to add entries · Row labels are editable</div>
+    <div class="view-sub" style="flex-wrap:wrap;gap:8px">
+      Click any month header to expand weeks &nbsp;·&nbsp; Hover a cell to add &nbsp;·&nbsp; Row labels are editable
+      <span class="week-hint">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Click a month column header to drill into its weeks
+      </span>
+    </div>
   </div>
 
   <div class="card fade-up d2" style="padding:0;overflow:hidden;margin-bottom:16px">
@@ -804,22 +880,64 @@ function buildPlannerHead(){
   const thead = document.getElementById('planner-thead');
   if(!thead) return;
 
-  // Q row
+  // Row 1: Q headers — span accounts for expanded months
   let qRow = `<tr><th class="row-col"></th>`;
-  const qCounts = [3,3,3,3];
-  qCounts.forEach((span,qi)=>{
-    qRow += `<th class="q${qi+1}-h" colspan="${span}" style="text-align:center;height:24px;font-size:10px;text-transform:uppercase;letter-spacing:.07em">${PLAN_QNAMES[qi]}</th>`;
+  [[0,1,2],[3,4,5],[6,7,8],[9,10,11]].forEach((idxs,qi)=>{
+    let span=0;
+    idxs.forEach(mi=>{
+      span+=1;
+      if(expandedMonths.has(PLAN_MONTHS[mi])) span+=MONTH_WEEKS[PLAN_MONTHS[mi]].length;
+    });
+    qRow+=`<th class="q${qi+1}-h" colspan="${span}" style="text-align:center;height:24px;font-size:10px;text-transform:uppercase;letter-spacing:.07em">${PLAN_QNAMES[qi]}</th>`;
   });
-  qRow += `</tr>`;
+  qRow+=`</tr>`;
 
-  // Month row
-  let mRow = `<tr><th class="row-col" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Row</th>`;
-  PLAN_MONTHS.forEach((m,i)=>{
-    mRow += `<th class="q${PLAN_Q[i]+1}-h" style="text-align:left">${m}</th>`;
+  // Row 2: Month headers (clickable to expand)
+  let mRow=`<tr><th class="row-col" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Row</th>`;
+  PLAN_MONTHS.forEach((m,mi)=>{
+    const isExp=expandedMonths.has(m);
+    const weeks=MONTH_WEEKS[m];
+    const isLastQ=[2,5,8,11].includes(mi);
+    const qcl=`q${PLAN_Q[mi]+1}-h`;
+    if(isExp){
+      mRow+=`<th class="${qcl} month-h expanded ${isLastQ?'month-col-end':''}" colspan="${weeks.length}"
+        onclick="toggleMonth('${m}')" title="Collapse weeks" style="text-align:center">
+        ${m}<span class="month-expand-icon">▼</span>
+      </th>`;
+    } else {
+      mRow+=`<th class="${qcl} month-h ${isLastQ?'month-col-end':''}"
+        onclick="toggleMonth('${m}')" title="Expand to show weeks">
+        ${m}<span class="month-expand-icon">▼</span>
+      </th>`;
+    }
   });
-  mRow += `</tr>`;
+  mRow+=`</tr>`;
 
-  thead.innerHTML = qRow + mRow;
+  // Row 3: Week sub-labels (only when at least one month is expanded)
+  let wkRow='';
+  if(expandedMonths.size>0){
+    wkRow=`<tr><th class="row-col" style="height:22px"></th>`;
+    PLAN_MONTHS.forEach((m,mi)=>{
+      const isExp=expandedMonths.has(m);
+      const isLastQ=[2,5,8,11].includes(mi);
+      if(isExp){
+        MONTH_WEEKS[m].forEach(([wl,wd],wi)=>{
+          const isLast=wi===MONTH_WEEKS[m].length-1;
+          wkRow+=`<th class="week-h${isLast&&isLastQ?' wk-last':''}" title="${wd}" style="height:26px;padding:2px 6px">${wl}<br><span style="font-size:9px;opacity:.55;font-weight:400">${wd}</span></th>`;
+        });
+      } else {
+        wkRow+=`<th class="q${PLAN_Q[mi]+1}-h${isLastQ?' month-col-end':''}" style="height:26px"></th>`;
+      }
+    });
+    wkRow+=`</tr>`;
+  }
+
+  thead.innerHTML=qRow+mRow+wkRow;
+}
+
+function toggleMonth(month){
+  expandedMonths.has(month)?expandedMonths.delete(month):expandedMonths.add(month);
+  buildPlannerTable();
 }
 
 function buildPlannerBody(){
@@ -843,79 +961,127 @@ function buildPlanRow(row, rowIdx){
   tdLabel.addEventListener('blur', e => { row.label = e.target.textContent.trim(); });
   tr.appendChild(tdLabel);
 
-  // Month cells
   PLAN_MONTHS.forEach((m, mi) => {
-    const td = document.createElement('td');
-    td.className = `cell ${PLAN_QCL[PLAN_Q[mi]]}`;
+    const isExp = expandedMonths.has(m);
+    const isLastInQ = [2,5,8,11].includes(mi);
+    const qcl = PLAN_QCL[PLAN_Q[mi]];
 
-    if(row.type === 'infl'){
-      const wrap = document.createElement('div');
-      wrap.className = 'infl-cell';
-      const sel = document.createElement('select');
-      sel.className = 'infl-select';
-      PLAN_INFL_OPTS.forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = o; opt.textContent = o;
-        if(o === row.data[m]) opt.selected = true;
-        sel.appendChild(opt);
+    if(isExp){
+      // ── Week cells ──
+      if(!row.weekData) row.weekData={};
+      if(!row.weekData[m]) row.weekData[m]={};
+      MONTH_WEEKS[m].forEach(([wl,wd],wi)=>{
+        const td=document.createElement('td');
+        const isLast=wi===MONTH_WEEKS[m].length-1;
+        td.className=`week-cell${isLast&&isLastInQ?' wk-last':''}${row.type==='infl'?' infl-wk':''}`;
+
+        if(row.type==='infl'){
+          const wrap=document.createElement('div');wrap.className='infl-cell';
+          const lbl=document.createElement('span');
+          lbl.style.cssText='font-size:11px;color:var(--grey-dk);font-weight:500';
+          lbl.textContent=row.data[m]||'—';
+          wrap.appendChild(lbl);td.appendChild(wrap);
+        } else if(row.type==='text'){
+          const inp=document.createElement('textarea');
+          inp.className='cell-text-input';
+          inp.value=(row.weekData[m]&&row.weekData[m][wl])||'';
+          inp.placeholder='…';inp.rows=1;inp.title=wd;
+          inp.addEventListener('change',e=>{
+            if(!row.weekData[m])row.weekData[m]={};
+            row.weekData[m][wl]=e.target.value;
+          });
+          td.appendChild(inp);
+        } else {
+          const chipsWrap=document.createElement('div');chipsWrap.className='cell-chips';
+          const arr=(row.weekData[m]&&row.weekData[m][wl])||[];
+          arr.forEach(txt=>{chipsWrap.appendChild(makeWeekChip(txt,row,m,wl,chipsWrap));});
+          td.appendChild(chipsWrap);
+          const addBtn=document.createElement('button');
+          addBtn.className='add-chip-trigger';addBtn.title=`Add to ${m} ${wl} (${wd})`;
+          addBtn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+          addBtn.addEventListener('click',e=>{
+            e.stopPropagation();
+            const val=prompt(`Add to ${m} ${wl} (${wd}):`);
+            if(!val)return;
+            if(!row.weekData[m])row.weekData[m]={};
+            if(!row.weekData[m][wl])row.weekData[m][wl]=[];
+            row.weekData[m][wl].push(val.trim());
+            chipsWrap.appendChild(makeWeekChip(val.trim(),row,m,wl,chipsWrap));
+          });
+          td.appendChild(addBtn);
+        }
+        tr.appendChild(td);
       });
-      sel.addEventListener('change', e => { row.data[m] = e.target.value; });
-      wrap.appendChild(sel);
-      td.appendChild(wrap);
-
-    } else if(row.type === 'text'){
-      const inp = document.createElement('textarea');
-      inp.className = 'cell-text-input';
-      inp.value = row.data[m] || '';
-      inp.placeholder = '…';
-      inp.rows = 1;
-      inp.addEventListener('change', e => { row.data[m] = e.target.value; });
-      td.appendChild(inp);
 
     } else {
-      // chip row
-      const chipsWrap = document.createElement('div');
-      chipsWrap.className = 'cell-chips';
+      // ── Normal month cell ──
+      const td = document.createElement('td');
+      td.className = `cell ${qcl}${isLastInQ?' month-col-end':''}`;
 
-      (row.data[m] || []).forEach((text, ci) => {
-        chipsWrap.appendChild(makeChip(text, row.chipClass, row, m, ci));
-      });
-      td.appendChild(chipsWrap);
-
-      // add button
-      const addBtn = document.createElement('button');
-      addBtn.className = 'add-chip-trigger';
-      addBtn.title = 'Add entry';
-      addBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-      addBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        const val = prompt('Add entry:');
-        if(!val) return;
-        if(!Array.isArray(row.data[m])) row.data[m] = [];
-        row.data[m].push(val.trim());
-        const ci = row.data[m].length - 1;
-        chipsWrap.insertBefore(makeChip(val.trim(), row.chipClass, row, m, ci), addBtn.previousSibling ? null : chipsWrap.firstChild);
-      });
-      td.appendChild(addBtn);
+      if(row.type === 'infl'){
+        const wrap = document.createElement('div');wrap.className = 'infl-cell';
+        const sel = document.createElement('select');sel.className = 'infl-select';
+        PLAN_INFL_OPTS.forEach(o => {
+          const opt = document.createElement('option');opt.value=o;opt.textContent=o;
+          if(o===row.data[m])opt.selected=true;sel.appendChild(opt);
+        });
+        sel.addEventListener('change', e => { row.data[m] = e.target.value; });
+        wrap.appendChild(sel);td.appendChild(wrap);
+      } else if(row.type === 'text'){
+        const inp = document.createElement('textarea');
+        inp.className='cell-text-input';inp.value=row.data[m]||'';inp.placeholder='…';inp.rows=1;
+        inp.addEventListener('change', e => { row.data[m]=e.target.value; });
+        td.appendChild(inp);
+      } else {
+        const chipsWrap=document.createElement('div');chipsWrap.className='cell-chips';
+        (row.data[m]||[]).forEach(text=>{
+          chipsWrap.appendChild(makeChip(text, row.chipClass, row, m, null));
+        });
+        td.appendChild(chipsWrap);
+        const addBtn=document.createElement('button');addBtn.className='add-chip-trigger';addBtn.title='Add entry';
+        addBtn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+        addBtn.addEventListener('click', e=>{
+          e.stopPropagation();
+          const val=prompt('Add entry:');if(!val)return;
+          if(!Array.isArray(row.data[m]))row.data[m]=[];
+          row.data[m].push(val.trim());
+          chipsWrap.appendChild(makeChip(val.trim(),row.chipClass,row,m,null));
+        });
+        td.appendChild(addBtn);
+      }
+      tr.appendChild(td);
     }
-
-    tr.appendChild(td);
   });
-
   return tr;
 }
 
-function makeChip(text, chipClass, row, month, idx){
-  const span = document.createElement('span');
-  span.className = `chip ${chipClass}`;
-  span.innerHTML = `${text}<button class="chip-x" title="Remove">×</button>`;
-  span.querySelector('.chip-x').addEventListener('click', e => {
+// Week chip helper
+function makeWeekChip(text, row, month, weekLabel, chipsWrap){
+  const span=document.createElement('span');
+  span.className=`chip ${row.chipClass}`;
+  const xBtn=document.createElement('button');xBtn.className='chip-x';xBtn.title='Remove';xBtn.textContent='×';
+  xBtn.addEventListener('click',e=>{
     e.stopPropagation();
-    if(!Array.isArray(row.data[month])) return;
-    const i = row.data[month].indexOf(text);
-    if(i > -1) row.data[month].splice(i, 1);
+    const arr=row.weekData[month]&&row.weekData[month][weekLabel];
+    if(!Array.isArray(arr))return;
+    const i=arr.indexOf(text);if(i>-1)arr.splice(i,1);
     span.remove();
   });
+  span.textContent=text;span.appendChild(xBtn);
+  return span;
+}
+
+function makeChip(text, chipClass, row, month, _idx){
+  const span=document.createElement('span');
+  span.className=`chip ${chipClass}`;
+  const xBtn=document.createElement('button');xBtn.className='chip-x';xBtn.title='Remove';xBtn.textContent='×';
+  xBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(!Array.isArray(row.data[month]))return;
+    const i=row.data[month].indexOf(text);if(i>-1)row.data[month].splice(i,1);
+    span.remove();
+  });
+  span.textContent=text;span.appendChild(xBtn);
   return span;
 }
 
@@ -1607,7 +1773,9 @@ function exportDashboard(){
   btn.disabled=true;
   fetch(window.location.pathname+window.location.search).then(r=>r.text()).then(html=>{
     const newDBString=`const DB = ${JSON.stringify(DB,null,2)};`;
-    const updated=html.replace(/const DB = \{[\s\S]*?\n\};/,newDBString);
+    let updated=html.replace(/const DB = \{[\s\S]*?\n\};/,newDBString);
+    const planClean=PLAN_ROWS.map(r=>({label:r.label,type:r.type,chipClass:r.chipClass,dividerAbove:r.dividerAbove,data:r.data,weekData:r.weekData||{}}));
+    updated=updated.replace(/let PLAN_ROWS = \[[\s\S]*?\n\];/,`let PLAN_ROWS = ${JSON.stringify(planClean,null,2)};`);
     const blob=new Blob([updated],{type:'text/html'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
