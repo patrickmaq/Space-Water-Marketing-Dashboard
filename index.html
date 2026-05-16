@@ -460,6 +460,34 @@ td.cell:hover .add-chip-trigger,td.week-cell:hover .add-chip-trigger{opacity:1}
 
 
 
+
+/* ── SAVE STATE ── */
+.unsaved-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--amber);display:none;flex-shrink:0;
+  box-shadow:0 0 0 2px var(--amber-pale);
+}
+.unsaved-dot.visible{display:block}
+.header-btn.saved-flash{
+  background:var(--green-pale)!important;
+  border-color:var(--green-border)!important;
+  color:var(--green)!important;
+}
+.copy-snapshot-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);color:var(--text);
+  font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;
+  padding:7px 13px;border-radius:8px;
+  border:1px solid var(--border);cursor:pointer;
+  transition:all .18s;white-space:nowrap;
+}
+.copy-snapshot-btn:hover{background:var(--surface2);border-color:var(--grey)}
+.copy-snapshot-btn.copied{
+  background:var(--green-pale)!important;
+  border-color:var(--green-border)!important;
+  color:var(--green)!important;
+}
+
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)}
 
 @media(max-width:600px){
@@ -491,9 +519,14 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-t
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Edit Mode
     </button>
+    <span class="unsaved-dot" id="unsaved-dot" title="You have unsaved changes"></span>
     <button class="header-btn" id="export-btn" onclick="exportDashboard()" style="display:none" title="Download index.html with your current data baked in">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Save &amp; Export
+    </button>
+    <button class="copy-snapshot-btn" id="snapshot-btn" onclick="copySnapshot()" style="display:none" title="Copy current data as JSON — paste to Claude when requesting updates">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copy Snapshot
     </button>
     <button class="header-btn" id="add-month-btn" onclick="addNextMonth()" style="display:none" title="Add the next month with blank data">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
@@ -789,6 +822,7 @@ function init(){
   } else {
     document.getElementById('edit-btn').style.display='flex';
     document.getElementById('export-btn').style.display='flex';
+    document.getElementById('snapshot-btn').style.display='flex';
     document.getElementById('add-month-btn').style.display='flex';
     document.getElementById('upload-btn').style.display='flex';
   }
@@ -1092,12 +1126,14 @@ function confirmSpan(addBtn){
 
   row.spans[month].push({ id: uid(), label, startWeek: startIdx, endWeek: endIdx });
   closePopovers();
+  markUnsaved();
   buildPlannerTable();
 }
 
 function deleteSpan(row, month, spanId){
   if(!row.spans || !row.spans[month]) return;
   row.spans[month] = row.spans[month].filter(s => s.id !== spanId);
+  markUnsaved();
   buildPlannerTable();
 }
 
@@ -1117,7 +1153,7 @@ function buildPlanRow(row, rowIdx){
   tdLabel.className = 'row-label';
   tdLabel.contentEditable = 'true';
   tdLabel.textContent = row.label;
-  tdLabel.addEventListener('blur', e => { row.label = e.target.textContent.trim(); });
+  tdLabel.addEventListener('blur', e => { row.label = e.target.textContent.trim(); markUnsaved(); });
   tr.appendChild(tdLabel);
 
   PLAN_MONTHS.forEach((m, mi) => {
@@ -1205,6 +1241,7 @@ function buildPlanRow(row, rowIdx){
             inp.addEventListener('change', e => {
               if(!row.weekData[m]) row.weekData[m] = {};
               row.weekData[m][wl] = e.target.value;
+              markUnsaved();
             });
             td.appendChild(inp);
 
@@ -1241,7 +1278,7 @@ function buildPlanRow(row, rowIdx){
           if(o === row.data[m]) opt.selected = true;
           sel.appendChild(opt);
         });
-        sel.addEventListener('change', e => { row.data[m] = e.target.value; });
+        sel.addEventListener('change', e => { row.data[m] = e.target.value; markUnsaved(); });
         wrap.appendChild(sel); td.appendChild(wrap);
 
       } else if(row.type === 'text'){
@@ -1292,6 +1329,7 @@ function buildPlanRow(row, rowIdx){
           if(!Array.isArray(row.data[m])) row.data[m] = [];
           row.data[m].push(val.trim());
           chipsWrap.insertBefore(makeChip(val.trim(), row.chipClass, row, m), chipsWrap.firstChild);
+          markUnsaved();
         });
         td.appendChild(addBtn);
       }
@@ -1312,6 +1350,7 @@ function makeChip(text, chipClass, row, month){
     if(!Array.isArray(row.data[month])) return;
     const i = row.data[month].indexOf(text); if(i > -1) row.data[month].splice(i, 1);
     span.remove();
+    markUnsaved();
   });
   span.textContent = text; span.appendChild(xBtn);
   return span;
@@ -1353,6 +1392,7 @@ function confirmAddRow(){
   PLAN_ROWS.push(newRow);
   const tbody = document.getElementById('planner-tbody');
   if(tbody) tbody.appendChild(buildPlanRow(newRow, PLAN_ROWS.length-1));
+  markUnsaved();
   closeAddRowModal();
 }
 
@@ -1695,7 +1735,7 @@ async function generateSummary(idx,mode,compareIdx=null){
     const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
     const totalTraffic=ytdIdx.reduce((s,i)=>s+DB.traffic[i],0);
     const avgRoas=DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).reduce((s,v)=>s+v,0)/DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).length;
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2026.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
   } else {
     const totalRev=DB.revenue.reduce((s,v)=>s+v,0);
     const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
@@ -1710,7 +1750,7 @@ async function generateSummary(idx,mode,compareIdx=null){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20260514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
     });
     if(!res.ok)throw new Error('API error');
     const data=await res.json();
@@ -1978,7 +2018,7 @@ async function parseReport(){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20260514',max_tokens:4000,messages:[{role:'user',content}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content}]})
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API error');}
     const data=await res.json();
@@ -2015,6 +2055,8 @@ function exportDashboard(){
     const a=document.createElement('a');
     a.href=url;a.download='index.html';a.click();
     URL.revokeObjectURL(url);
+    markSaved();
+    autoSave();
     btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved!`;
     setTimeout(()=>{btn.disabled=false;btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Save &amp; Export`;},2500);
   }).catch(()=>{
@@ -2023,7 +2065,131 @@ function exportDashboard(){
   });
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PERSISTENCE — localStorage auto-save + unsaved indicator + snapshot
+   ═══════════════════════════════════════════════════════════════════════ */
+const LS_KEY = 'sw_dashboard_v1';
+let _hasUnsaved = false;
+let _saveTimer = null;
+
+/* Mark unsaved — call whenever data changes */
+function markUnsaved(){
+  _hasUnsaved = true;
+  const dot = document.getElementById('unsaved-dot');
+  if(dot) dot.classList.add('visible');
+  // Auto-save to localStorage after 1.5s of inactivity
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(autoSave, 1500);
+}
+
+function markSaved(){
+  _hasUnsaved = false;
+  const dot = document.getElementById('unsaved-dot');
+  if(dot) dot.classList.remove('visible');
+}
+
+/* Save current state to localStorage */
+function autoSave(){
+  try{
+    const planClean = PLAN_ROWS.map(r=>({
+      label:r.label, type:r.type, chipClass:r.chipClass,
+      dividerAbove:r.dividerAbove, data:r.data,
+      weekData:r.weekData||{}, spans:r.spans||{}
+    }));
+    const snapshot = {
+      db: DB,
+      planRows: planClean,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(snapshot));
+    markSaved();
+  } catch(e){
+    console.warn('Auto-save failed:', e);
+  }
+}
+
+/* Load from localStorage on startup */
+function loadFromLocalStorage(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const snapshot = JSON.parse(raw);
+    if(!snapshot.db || !snapshot.planRows) return false;
+
+    // Check if localStorage is newer — compare month count as a simple signal
+    const lsMonths = snapshot.db.months || [];
+    const codeMonths = DB.months || [];
+    // Only restore if localStorage has more months OR same months (user worked in browser)
+    // If code has more months (new deploy), prefer code
+    if(lsMonths.length >= codeMonths.length){
+      Object.assign(DB, snapshot.db);
+      // Restore PLAN_ROWS preserving structure
+      PLAN_ROWS.length = 0;
+      snapshot.planRows.forEach(r => PLAN_ROWS.push({
+        label: r.label, type: r.type, chipClass: r.chipClass,
+        dividerAbove: r.dividerAbove || false,
+        data: r.data, weekData: r.weekData || {}, spans: r.spans || {}
+      }));
+      console.log('Restored from localStorage, saved at:', snapshot.savedAt);
+      return true;
+    }
+    return false;
+  } catch(e){
+    console.warn('Could not load from localStorage:', e);
+    return false;
+  }
+}
+
+/* Copy Snapshot — copies DB + PLAN_ROWS as clean JSON for sharing with Claude */
+function copySnapshot(){
+  const btn = document.getElementById('snapshot-btn');
+  const planClean = PLAN_ROWS.map(r=>({
+    label:r.label, type:r.type, chipClass:r.chipClass,
+    dividerAbove:r.dividerAbove, data:r.data,
+    weekData:r.weekData||{}, spans:r.spans||{}
+  }));
+  const snapshot = {
+    _note: "Space Water Dashboard Snapshot — paste this to Claude when requesting updates",
+    _savedAt: new Date().toISOString(),
+    DB,
+    PLAN_ROWS: planClean
+  };
+  const text = JSON.stringify(snapshot, null, 2);
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy Snapshot`;
+    }, 2500);
+  }).catch(()=>{
+    // Fallback for browsers that block clipboard
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    btn.textContent = 'Copied!';
+    setTimeout(()=>{ btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy Snapshot`; }, 2500);
+  });
+}
+
+/* Warn on page unload if unsaved */
+window.addEventListener('beforeunload', e => {
+  if(_hasUnsaved){
+    e.preventDefault();
+    e.returnValue = 'You have unsaved changes. Export first or they will be lost.';
+  }
+});
+
+
 /* ── Go ── */
+
+// Try restoring from localStorage before init
+loadFromLocalStorage();
 init();
 </script>
 </body>
