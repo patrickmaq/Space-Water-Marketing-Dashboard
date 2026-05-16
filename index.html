@@ -340,7 +340,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   border-radius:4px;
 }
 .add-chip-trigger:hover{color:var(--blue);background:var(--blue-pale)}
-td.cell:hover .add-chip-trigger{opacity:1}
+td.cell:hover .add-chip-trigger,td.week-cell:hover .add-chip-trigger{opacity:1}
 
 .planner-legend{
   display:flex;flex-wrap:wrap;gap:10px;
@@ -740,7 +740,7 @@ let PLAN_ROWS = [
 ];
 
 
-// Weeks per month (2026 calendar)
+// Weeks per month (2025 calendar)
 const MONTH_WEEKS = {
   Jan:[['W1','Jan 1–5'],  ['W2','Jan 6–12'],  ['W3','Jan 13–19'], ['W4','Jan 20–26'], ['W5','Jan 27–31']],
   Feb:[['W1','Feb 1–2'],  ['W2','Feb 3–9'],   ['W3','Feb 10–16'], ['W4','Feb 17–23'], ['W5','Feb 24–28']],
@@ -815,7 +815,7 @@ function buildTabs(){
   html += `<div class="tab-divider"></div>`;
   html += `<button class="tab plan-tab ${currentTab==='plan'?'active':''}" onclick="switchTab('plan')">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline;vertical-align:-1px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    2026 Annual Plan
+    2025 Annual Plan
   </button>`;
   container.innerHTML = html;
 }
@@ -886,7 +886,7 @@ function renderAnnualPlan(container){
   <div class="view-header fade-up d1">
     <div class="view-eyebrow purple">Marketing Calendar</div>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <h1 class="view-title">2026 Annual Plan</h1>
+      <h1 class="view-title">2025 Annual Plan</h1>
       <div class="planner-btn-group">
         <button class="planner-btn" onclick="exportPlanCSV()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1370,7 +1370,7 @@ function exportPlanCSV(){
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'space_water_2026_annual_plan.csv';
+  a.download = 'space_water_2025_annual_plan.csv';
   a.click();
 }
 
@@ -1695,7 +1695,7 @@ async function generateSummary(idx,mode,compareIdx=null){
     const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
     const totalTraffic=ytdIdx.reduce((s,i)=>s+DB.traffic[i],0);
     const avgRoas=DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).reduce((s,v)=>s+v,0)/DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).length;
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2026.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
   } else {
     const totalRev=DB.revenue.reduce((s,v)=>s+v,0);
     const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
@@ -1710,7 +1710,7 @@ async function generateSummary(idx,mode,compareIdx=null){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20260514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
     });
     if(!res.ok)throw new Error('API error');
     const data=await res.json();
@@ -1978,7 +1978,7 @@ async function parseReport(){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-api-key-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20260514',max_tokens:4000,messages:[{role:'user',content}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content}]})
     });
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'API error');}
     const data=await res.json();
