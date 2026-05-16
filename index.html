@@ -398,6 +398,66 @@ td.cell:hover .add-chip-trigger{opacity:1}
   background:var(--surface2);border:1px solid var(--border);
   border-radius:6px;padding:4px 10px;margin-top:2px;
 }
+/* ── SPAN / GANTT BARS ── */
+.span-bar{
+  display:flex;align-items:center;
+  height:26px;border-radius:4px;
+  padding:0 8px 0 10px;
+  font-size:10px;font-weight:600;
+  white-space:nowrap;overflow:hidden;
+  position:relative;cursor:default;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+  gap:6px;
+}
+.span-bar-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.span-bar-del{
+  background:none;border:none;cursor:pointer;
+  font-size:13px;line-height:1;opacity:.55;
+  padding:0;flex-shrink:0;color:inherit;
+}
+.span-bar-del:hover{opacity:1}
+/* continuation cell (spanned) — visually extends the bar */
+.span-cont{
+  height:26px;
+  border-radius:0;
+  opacity:.75;
+  position:relative;
+}
+.span-cont::after{
+  content:'';position:absolute;right:-1px;top:4px;bottom:4px;
+  width:2px;background:rgba(255,255,255,.4);border-radius:1px;
+}
+/* Add span popover */
+.span-popover{
+  position:absolute;z-index:50;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  width:220px;
+  animation:slideIn .15s ease;
+}
+.span-popover label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.span-popover input,.span-popover select{
+  width:100%;padding:6px 8px;border:1px solid var(--border);
+  border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;
+  background:var(--surface);color:var(--text);outline:none;margin-bottom:8px;
+}
+.span-popover input:focus,.span-popover select:focus{border-color:var(--blue)}
+.span-popover-btns{display:flex;gap:6px}
+.span-popover-add{
+  flex:1;padding:6px;border:none;border-radius:6px;
+  background:var(--blue);color:#fff;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+.span-popover-add:hover{background:var(--blue-dark)}
+.span-popover-cancel{
+  padding:6px 10px;border:1px solid var(--border);border-radius:6px;
+  background:var(--surface2);color:var(--muted);font-size:12px;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+/* Month view summary chip for spans */
+.chip-span-summary{font-style:normal}
+
 
 
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)}
@@ -635,47 +695,47 @@ let PLAN_ROWS = [
   {
     label:'USA Events', type:'chip', chipClass:'chip-usa', dividerAbove:false,
     data:{Jan:['Happy New Year'],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['4th of July','Prime Day'],Aug:[],Sep:['Labour Day'],Oct:[],Nov:['Black Friday'],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'CDN Events', type:'chip', chipClass:'chip-cdn', dividerAbove:false,
     data:{Jan:['Happy New Year'],Feb:["Valentine's Day",'Family Day'],Mar:["Int'l Women's Day"],Apr:['Easter','Earth Day'],May:["Mother's Day"],Jun:["Father's Day"],Jul:['BC Day','Pride'],Aug:[],Sep:['Labour Day','Equinox Sale'],Oct:['Halloween'],Nov:['Black Friday'],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Promotions', type:'chip', chipClass:'chip-promo', dividerAbove:false,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['10% off'],Oct:['10% off'],Nov:['25% off'],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Newsletter', type:'chip', chipClass:'chip-nl', dividerAbove:true,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Teaser','Launch','Last Call'],Oct:['Weekend Sale'],Nov:[],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Theme', type:'chip', chipClass:'chip-theme', dividerAbove:false,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['Pride'],Aug:[],Sep:[],Oct:[],Nov:['Black Friday'],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Blog', type:'chip', chipClass:'chip-blog', dividerAbove:false,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Xmas long lead'],Oct:['Xmas mid lead'],Nov:['Xmas bookings'],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Events / Partners', type:'chip', chipClass:'chip-event', dividerAbove:false,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Contests', type:'chip', chipClass:'chip-contest', dividerAbove:false,
     data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
-    weekData:{}
+    weekData:{},spans:{}
   },
   {
     label:'Influencers', type:'infl', chipClass:'', dividerAbove:true,
     data:{Jan:'2/wk',Feb:'3/wk',Mar:'4/wk',Apr:'5/wk',May:'6/wk',Jun:'7/wk',Jul:'8/wk',Aug:'9/wk',Sep:'10/wk',Oct:'11/wk',Nov:'12/wk',Dec:'12/wk'},
-    weekData:{}
+    weekData:{},spans:{}
   },
 ];
 
@@ -949,11 +1009,110 @@ function buildPlannerBody(){
   });
 }
 
+/* ── helpers ── */
+function uid(){ return Math.random().toString(36).slice(2,8); }
+
+function chipColor(chipClass){
+  const map={
+    'chip-usa':'#3879a5','chip-cdn':'#2a9d8f','chip-promo':'#d4880a',
+    'chip-nl':'#7c5cbf','chip-theme':'#c2415a','chip-blog':'#2a9d8f',
+    'chip-event':'#7a8588','chip-contest':'#6b2fa0','chip-custom':'#3879a5',
+    '':"#bec3c6"
+  };
+  return map[chipClass]||'#3879a5';
+}
+
+/* ── Close any open popovers ── */
+function closePopovers(){
+  document.querySelectorAll('.span-popover').forEach(p=>p.remove());
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.span-popover') && !e.target.closest('.add-chip-trigger'))
+    closePopovers();
+},{capture:true});
+
+/* ─────────────────────────────────────────────
+   OPEN SPAN POPOVER
+   called from the + button in a week cell
+───────────────────────────────────────────── */
+function openSpanPopover(btn, row, month, startWeekIdx){
+  closePopovers();
+  const weeks = MONTH_WEEKS[month];
+  const col = btn.closest('td');
+
+  const pop = document.createElement('div');
+  pop.className = 'span-popover';
+  pop.style.cssText = 'top:calc(100% + 4px);left:0;right:auto';
+
+  // Build end-week options (startWeek onward)
+  let wkOpts = weeks.map(([wl,wd],i) =>
+    i >= startWeekIdx
+      ? `<option value="${i}"${i===startWeekIdx?' selected':''}>${wl} (${wd})</option>`
+      : ''
+  ).join('');
+
+  pop.innerHTML = `
+    <label>Event name</label>
+    <input id="sp-name" type="text" placeholder="e.g. Flash Sale" autocomplete="off"/>
+    <label>Ends</label>
+    <select id="sp-end">${wkOpts}</select>
+    <div class="span-popover-btns">
+      <button class="span-popover-cancel" onclick="closePopovers()">Cancel</button>
+      <button class="span-popover-add" onclick="confirmSpan(this)">Add</button>
+    </div>`;
+
+  // Store context
+  pop._row = row;
+  pop._month = month;
+  pop._startWeekIdx = startWeekIdx;
+
+  col.style.position = 'relative';
+  col.appendChild(pop);
+  pop.querySelector('#sp-name').focus();
+
+  // Enter key submits
+  pop.querySelector('#sp-name').addEventListener('keydown', e=>{
+    if(e.key==='Enter') pop.querySelector('.span-popover-add').click();
+    if(e.key==='Escape') closePopovers();
+  });
+}
+
+function confirmSpan(addBtn){
+  const pop = addBtn.closest('.span-popover');
+  const label = pop.querySelector('#sp-name').value.trim();
+  if(!label){ pop.querySelector('#sp-name').focus(); return; }
+  const endIdx = parseInt(pop.querySelector('#sp-end').value);
+
+  const row = pop._row;
+  const month = pop._month;
+  const startIdx = pop._startWeekIdx;
+
+  if(!row.spans) row.spans = {};
+  if(!row.spans[month]) row.spans[month] = [];
+
+  row.spans[month].push({ id: uid(), label, startWeek: startIdx, endWeek: endIdx });
+  closePopovers();
+  buildPlannerTable();
+}
+
+function deleteSpan(row, month, spanId){
+  if(!row.spans || !row.spans[month]) return;
+  row.spans[month] = row.spans[month].filter(s => s.id !== spanId);
+  buildPlannerTable();
+}
+
+/* ─────────────────────────────────────────────
+   BUILD ROW
+───────────────────────────────────────────── */
 function buildPlanRow(row, rowIdx){
   const tr = document.createElement('tr');
   if(row.dividerAbove) tr.classList.add('divider-above');
 
-  // Label cell
+  // Ensure structures
+  if(!row.spans) row.spans = {};
+  if(!row.weekData) row.weekData = {};
+
+  // Label
   const tdLabel = document.createElement('td');
   tdLabel.className = 'row-label';
   tdLabel.contentEditable = 'true';
@@ -967,121 +1126,194 @@ function buildPlanRow(row, rowIdx){
     const qcl = PLAN_QCL[PLAN_Q[mi]];
 
     if(isExp){
-      // ── Week cells ──
-      if(!row.weekData) row.weekData={};
-      if(!row.weekData[m]) row.weekData[m]={};
-      MONTH_WEEKS[m].forEach(([wl,wd],wi)=>{
-        const td=document.createElement('td');
-        const isLast=wi===MONTH_WEEKS[m].length-1;
-        td.className=`week-cell${isLast&&isLastInQ?' wk-last':''}${row.type==='infl'?' infl-wk':''}`;
+      /* ── WEEK VIEW ── */
+      if(!row.weekData[m]) row.weekData[m] = {};
+      if(!row.spans[m]) row.spans[m] = [];
 
-        if(row.type==='infl'){
-          const wrap=document.createElement('div');wrap.className='infl-cell';
-          const lbl=document.createElement('span');
-          lbl.style.cssText='font-size:11px;color:var(--grey-dk);font-weight:500';
-          lbl.textContent=row.data[m]||'—';
-          wrap.appendChild(lbl);td.appendChild(wrap);
-        } else if(row.type==='text'){
-          const inp=document.createElement('textarea');
-          inp.className='cell-text-input';
-          inp.value=(row.weekData[m]&&row.weekData[m][wl])||'';
-          inp.placeholder='…';inp.rows=1;inp.title=wd;
-          inp.addEventListener('change',e=>{
-            if(!row.weekData[m])row.weekData[m]={};
-            row.weekData[m][wl]=e.target.value;
-          });
-          td.appendChild(inp);
-        } else {
-          const chipsWrap=document.createElement('div');chipsWrap.className='cell-chips';
-          const arr=(row.weekData[m]&&row.weekData[m][wl])||[];
-          arr.forEach(txt=>{chipsWrap.appendChild(makeWeekChip(txt,row,m,wl,chipsWrap));});
-          td.appendChild(chipsWrap);
-          const addBtn=document.createElement('button');
-          addBtn.className='add-chip-trigger';addBtn.title=`Add to ${m} ${wl} (${wd})`;
-          addBtn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-          addBtn.addEventListener('click',e=>{
-            e.stopPropagation();
-            const val=prompt(`Add to ${m} ${wl} (${wd}):`);
-            if(!val)return;
-            if(!row.weekData[m])row.weekData[m]={};
-            if(!row.weekData[m][wl])row.weekData[m][wl]=[];
-            row.weekData[m][wl].push(val.trim());
-            chipsWrap.appendChild(makeWeekChip(val.trim(),row,m,wl,chipsWrap));
-          });
-          td.appendChild(addBtn);
+      const weeks = MONTH_WEEKS[m];
+      const spans = row.spans[m];
+
+      // Which week cells are covered by a span (map weekIdx -> span or null)
+      const spanCoverage = new Array(weeks.length).fill(null);
+      spans.forEach(sp => {
+        for(let wi = sp.startWeek; wi <= Math.min(sp.endWeek, weeks.length-1); wi++){
+          spanCoverage[wi] = sp;
         }
-        tr.appendChild(td);
       });
 
+      let wi = 0;
+      while(wi < weeks.length){
+        const [wl, wd] = weeks[wi];
+        const isLast = wi === weeks.length - 1;
+        const sp = spanCoverage[wi];
+
+        if(sp && sp.startWeek === wi){
+          /* ── Span start cell ── */
+          const spanLen = Math.min(sp.endWeek, weeks.length-1) - sp.startWeek + 1;
+          const td = document.createElement('td');
+          td.className = `week-cell${isLast&&isLastInQ?' wk-last':''}`;
+          td.colSpan = spanLen;
+          td.style.padding = '4px 6px';
+
+          const color = chipColor(row.chipClass);
+          const bar = document.createElement('div');
+          bar.className = 'span-bar';
+          bar.style.cssText = `background:${color};color:#fff;`;
+          if(spanLen === 1) bar.style.borderRadius = '4px';
+          else bar.style.borderRadius = '4px 4px 4px 4px';
+
+          const lbl = document.createElement('span');
+          lbl.className = 'span-bar-label';
+          lbl.textContent = sp.label;
+          const del = document.createElement('button');
+          del.className = 'span-bar-del';
+          del.title = 'Remove';
+          del.textContent = '×';
+          del.addEventListener('click', e => {
+            e.stopPropagation();
+            deleteSpan(row, m, sp.id);
+          });
+          bar.appendChild(lbl);
+          bar.appendChild(del);
+          td.appendChild(bar);
+
+          // Add button only if no span covering this area — but bar takes full cell
+          tr.appendChild(td);
+          wi += spanLen;
+
+        } else if(sp && sp.startWeek !== wi){
+          /* ── Span continuation — already consumed by colspan, skip ── */
+          wi++;
+
+        } else {
+          /* ── Normal week cell ── */
+          const td = document.createElement('td');
+          td.className = `week-cell${isLast&&isLastInQ?' wk-last':''}${row.type==='infl'?' infl-wk':''}`;
+
+          if(row.type === 'infl'){
+            const wrap = document.createElement('div'); wrap.className = 'infl-cell';
+            const lbl2 = document.createElement('span');
+            lbl2.style.cssText = 'font-size:11px;color:var(--grey-dk);font-weight:500';
+            lbl2.textContent = row.data[m] || '—';
+            wrap.appendChild(lbl2); td.appendChild(wrap);
+
+          } else if(row.type === 'text'){
+            const inp = document.createElement('textarea');
+            inp.className = 'cell-text-input';
+            inp.value = (row.weekData[m] && row.weekData[m][wl]) || '';
+            inp.placeholder = '…'; inp.rows = 1; inp.title = wd;
+            inp.addEventListener('change', e => {
+              if(!row.weekData[m]) row.weekData[m] = {};
+              row.weekData[m][wl] = e.target.value;
+            });
+            td.appendChild(inp);
+
+          } else {
+            // Chip row — show + button that opens span popover
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-chip-trigger';
+            addBtn.title = `Add event starting ${wd}`;
+            addBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+            const capturedWi = wi;
+            addBtn.addEventListener('click', e => {
+              e.stopPropagation();
+              openSpanPopover(addBtn, row, m, capturedWi);
+            });
+            td.appendChild(addBtn);
+          }
+
+          tr.appendChild(td);
+          wi++;
+        }
+      }
+
     } else {
-      // ── Normal month cell ──
+      /* ── MONTH VIEW ── */
       const td = document.createElement('td');
       td.className = `cell ${qcl}${isLastInQ?' month-col-end':''}`;
 
       if(row.type === 'infl'){
-        const wrap = document.createElement('div');wrap.className = 'infl-cell';
-        const sel = document.createElement('select');sel.className = 'infl-select';
+        const wrap = document.createElement('div'); wrap.className = 'infl-cell';
+        const sel = document.createElement('select'); sel.className = 'infl-select';
         PLAN_INFL_OPTS.forEach(o => {
-          const opt = document.createElement('option');opt.value=o;opt.textContent=o;
-          if(o===row.data[m])opt.selected=true;sel.appendChild(opt);
+          const opt = document.createElement('option');
+          opt.value = o; opt.textContent = o;
+          if(o === row.data[m]) opt.selected = true;
+          sel.appendChild(opt);
         });
         sel.addEventListener('change', e => { row.data[m] = e.target.value; });
-        wrap.appendChild(sel);td.appendChild(wrap);
+        wrap.appendChild(sel); td.appendChild(wrap);
+
       } else if(row.type === 'text'){
         const inp = document.createElement('textarea');
-        inp.className='cell-text-input';inp.value=row.data[m]||'';inp.placeholder='…';inp.rows=1;
-        inp.addEventListener('change', e => { row.data[m]=e.target.value; });
+        inp.className = 'cell-text-input'; inp.value = row.data[m] || '';
+        inp.placeholder = '…'; inp.rows = 1;
+        inp.addEventListener('change', e => { row.data[m] = e.target.value; });
         td.appendChild(inp);
+
       } else {
-        const chipsWrap=document.createElement('div');chipsWrap.className='cell-chips';
-        (row.data[m]||[]).forEach(text=>{
-          chipsWrap.appendChild(makeChip(text, row.chipClass, row, m, null));
+        // Chip row: show month chips + span summaries
+        const chipsWrap = document.createElement('div'); chipsWrap.className = 'cell-chips';
+
+        // Month-level chips
+        (row.data[m] || []).forEach(text => {
+          chipsWrap.appendChild(makeChip(text, row.chipClass, row, m));
         });
+
+        // Span summaries
+        const monthSpans = (row.spans && row.spans[m]) || [];
+        const weeks = MONTH_WEEKS[m];
+        monthSpans.forEach(sp => {
+          const sw = weeks[sp.startWeek] ? weeks[sp.startWeek][0] : 'W?';
+          const ew = weeks[Math.min(sp.endWeek, weeks.length-1)] ? weeks[Math.min(sp.endWeek,weeks.length-1)][0] : 'W?';
+          const label = sw === ew ? `${sp.label} (${sw})` : `${sp.label} (${sw}–${ew})`;
+          const chip = document.createElement('span');
+          chip.className = `chip ${row.chipClass} chip-span-summary`;
+          const delBtn = document.createElement('button');
+          delBtn.className = 'chip-x'; delBtn.title = 'Remove span'; delBtn.textContent = '×';
+          delBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            deleteSpan(row, m, sp.id);
+            buildPlannerTable();
+          });
+          chip.textContent = label;
+          chip.appendChild(delBtn);
+          chipsWrap.appendChild(chip);
+        });
+
         td.appendChild(chipsWrap);
-        const addBtn=document.createElement('button');addBtn.className='add-chip-trigger';addBtn.title='Add entry';
-        addBtn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-        addBtn.addEventListener('click', e=>{
+
+        // Month-level + button
+        const addBtn = document.createElement('button'); addBtn.className = 'add-chip-trigger'; addBtn.title = 'Add entry';
+        addBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+        addBtn.addEventListener('click', e => {
           e.stopPropagation();
-          const val=prompt('Add entry:');if(!val)return;
-          if(!Array.isArray(row.data[m]))row.data[m]=[];
+          const val = prompt('Add entry:'); if(!val) return;
+          if(!Array.isArray(row.data[m])) row.data[m] = [];
           row.data[m].push(val.trim());
-          chipsWrap.appendChild(makeChip(val.trim(),row.chipClass,row,m,null));
+          chipsWrap.insertBefore(makeChip(val.trim(), row.chipClass, row, m), chipsWrap.firstChild);
         });
         td.appendChild(addBtn);
       }
+
       tr.appendChild(td);
     }
   });
+
   return tr;
 }
 
-// Week chip helper
-function makeWeekChip(text, row, month, weekLabel, chipsWrap){
-  const span=document.createElement('span');
-  span.className=`chip ${row.chipClass}`;
-  const xBtn=document.createElement('button');xBtn.className='chip-x';xBtn.title='Remove';xBtn.textContent='×';
-  xBtn.addEventListener('click',e=>{
+function makeChip(text, chipClass, row, month){
+  const span = document.createElement('span');
+  span.className = `chip ${chipClass}`;
+  const xBtn = document.createElement('button'); xBtn.className = 'chip-x'; xBtn.title = 'Remove'; xBtn.textContent = '×';
+  xBtn.addEventListener('click', e => {
     e.stopPropagation();
-    const arr=row.weekData[month]&&row.weekData[month][weekLabel];
-    if(!Array.isArray(arr))return;
-    const i=arr.indexOf(text);if(i>-1)arr.splice(i,1);
+    if(!Array.isArray(row.data[month])) return;
+    const i = row.data[month].indexOf(text); if(i > -1) row.data[month].splice(i, 1);
     span.remove();
   });
-  span.textContent=text;span.appendChild(xBtn);
-  return span;
-}
-
-function makeChip(text, chipClass, row, month, _idx){
-  const span=document.createElement('span');
-  span.className=`chip ${chipClass}`;
-  const xBtn=document.createElement('button');xBtn.className='chip-x';xBtn.title='Remove';xBtn.textContent='×';
-  xBtn.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(!Array.isArray(row.data[month]))return;
-    const i=row.data[month].indexOf(text);if(i>-1)row.data[month].splice(i,1);
-    span.remove();
-  });
-  span.textContent=text;span.appendChild(xBtn);
+  span.textContent = text; span.appendChild(xBtn);
   return span;
 }
 
@@ -1110,6 +1342,8 @@ function confirmAddRow(){
     type: isInfl ? 'infl' : isText ? 'text' : 'chip',
     chipClass: isInfl || isText ? '' : selectedRowType,
     dividerAbove: false,
+    spans: {},
+    weekData: {},
     data: isInfl
       ? Object.fromEntries(PLAN_MONTHS.map(m => [m,'—']))
       : isText
@@ -1774,7 +2008,7 @@ function exportDashboard(){
   fetch(window.location.pathname+window.location.search).then(r=>r.text()).then(html=>{
     const newDBString=`const DB = ${JSON.stringify(DB,null,2)};`;
     let updated=html.replace(/const DB = \{[\s\S]*?\n\};/,newDBString);
-    const planClean=PLAN_ROWS.map(r=>({label:r.label,type:r.type,chipClass:r.chipClass,dividerAbove:r.dividerAbove,data:r.data,weekData:r.weekData||{}}));
+    const planClean=PLAN_ROWS.map(r=>({label:r.label,type:r.type,chipClass:r.chipClass,dividerAbove:r.dividerAbove,data:r.data,weekData:r.weekData||{},spans:r.spans||{}}));
     updated=updated.replace(/let PLAN_ROWS = \[[\s\S]*?\n\];/,`let PLAN_ROWS = ${JSON.stringify(planClean,null,2)};`);
     const blob=new Blob([updated],{type:'text/html'});
     const url=URL.createObjectURL(blob);
