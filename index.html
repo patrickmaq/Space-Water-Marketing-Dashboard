@@ -701,17 +701,215 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-t
    DATA
    ══════════════════════════════════════════════════════════════════════ */
 const DB = {
-  months:["Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"],
-  traffic:    [2,27,86,230,150,182,1400,1900,1600,2300,1800,1400,2800,2700,2700,2600],
-  unique:     [2,13,71,149,115,137,1300,1600,1300,2100,1600,1300,2500,2500,2400,2300],
-  purchases:  [0,0,0,16,7,11,9,15,8,12,18,11,12,5,5,9],
-  cvr:        [0,0,0,10.74,6.09,8.03,0.69,0.94,0.62,0.57,1.13,0.85,0.48,0.20,0.21,0.35],
-  aov:        [0,0,0,150.94,126.85,170.18,125.98,180.66,134.80,135.86,159.79,95.53,229.84,134.85,145.28,154.22],
-  revenue:    [0,0,0,2414.97,887.97,1872.00,1133.85,2709.95,1078.40,1630.35,2876.20,1050.85,2758.10,674.25,726.40,925.30],
-  roas:       [null,null,null,null,null,null,5.35,10.27,3.48,5.30,8.99,3.90,9.31,2.33,2.42,3.08],
-  meta:       [0,0,0,0,0,0,212,264,310,308,320,270,296,290,300,300],
-  email:      [0,0,175,173,178,216,238,276,314,366,423,461,514,569,628,672],
-  emailGrowth:[0,0,175,-2,5,38,22,38,38,52,57,38,53,55,59,44],
+  "months": [
+    "Jan '25",
+    "Feb '25",
+    "Mar '25",
+    "Apr '25",
+    "May '25",
+    "Jun '25",
+    "Jul '25",
+    "Aug '25",
+    "Sep '25",
+    "Oct '25",
+    "Nov '25",
+    "Dec '25",
+    "Jan '26",
+    "Feb '26",
+    "Mar '26",
+    "Apr '26",
+    "May '26"
+  ],
+  "traffic": [
+    2,
+    27,
+    86,
+    230,
+    150,
+    182,
+    1400,
+    1900,
+    1600,
+    2300,
+    1800,
+    1400,
+    2800,
+    2700,
+    2700,
+    2600,
+    2700
+  ],
+  "unique": [
+    2,
+    13,
+    71,
+    149,
+    115,
+    137,
+    1300,
+    1600,
+    1300,
+    2100,
+    1600,
+    1300,
+    2500,
+    2500,
+    2400,
+    2300,
+    2400
+  ],
+  "purchases": [
+    0,
+    0,
+    0,
+    16,
+    7,
+    11,
+    9,
+    15,
+    8,
+    12,
+    18,
+    11,
+    12,
+    5,
+    5,
+    9,
+    7
+  ],
+  "cvr": [
+    0,
+    0,
+    0,
+    10.74,
+    6.09,
+    8.03,
+    0.69,
+    0.94,
+    0.62,
+    0.57,
+    1.13,
+    0.85,
+    0.48,
+    0.2,
+    0.21,
+    0.35,
+    0.2593
+  ],
+  "aov": [
+    0,
+    0,
+    0,
+    150.94,
+    126.85,
+    170.18,
+    125.98,
+    180.66,
+    134.8,
+    135.86,
+    159.79,
+    95.53,
+    229.84,
+    134.85,
+    145.28,
+    154.22,
+    188.07
+  ],
+  "revenue": [
+    0,
+    0,
+    0,
+    2414.97,
+    887.97,
+    1872,
+    1133.85,
+    2709.95,
+    1078.4,
+    1630.35,
+    2876.2,
+    1050.85,
+    2758.1,
+    674.25,
+    726.4,
+    925.3,
+    1316.5
+  ],
+  "roas": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    5.35,
+    10.27,
+    3.48,
+    5.3,
+    8.99,
+    3.9,
+    9.31,
+    2.33,
+    2.42,
+    3.08,
+    4.3883
+  ],
+  "meta": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    212,
+    264,
+    310,
+    308,
+    320,
+    270,
+    296,
+    290,
+    300,
+    300,
+    300
+  ],
+  "email": [
+    0,
+    0,
+    175,
+    173,
+    178,
+    216,
+    238,
+    276,
+    314,
+    366,
+    423,
+    461,
+    514,
+    569,
+    628,
+    672,
+    728
+  ],
+  "emailGrowth": [
+    0,
+    0,
+    175,
+    -2,
+    5,
+    38,
+    22,
+    38,
+    38,
+    52,
+    57,
+    38,
+    53,
+    55,
+    59,
+    44,
+    56
+  ]
 };
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -726,50 +924,258 @@ const PLAN_INFL_OPTS = ['—','1/wk','2/wk','3/wk','4/wk','5/wk','6/wk','7/wk','
 // Plan rows: { label, type, chipClass, dividerAbove, data: {Jan:..., Feb:..., ...} }
 let PLAN_ROWS = [
   {
-    label:'USA Events', type:'chip', chipClass:'chip-usa', dividerAbove:false,
-    data:{Jan:['Happy New Year'],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['4th of July','Prime Day'],Aug:[],Sep:['Labour Day'],Oct:[],Nov:['Black Friday'],Dec:[]},
-    weekData:{},spans:{}
+    "label": "USA Events",
+    "type": "chip",
+    "chipClass": "chip-usa",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [
+        "Happy New Year"
+      ],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [
+        "4th of July",
+        "Prime Day"
+      ],
+      "Aug": [],
+      "Sep": [
+        "Labour Day"
+      ],
+      "Oct": [],
+      "Nov": [
+        "Black Friday"
+      ],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'CDN Events', type:'chip', chipClass:'chip-cdn', dividerAbove:false,
-    data:{Jan:['Happy New Year'],Feb:["Valentine's Day",'Family Day'],Mar:["Int'l Women's Day"],Apr:['Easter','Earth Day'],May:["Mother's Day"],Jun:["Father's Day"],Jul:['BC Day','Pride'],Aug:[],Sep:['Labour Day','Equinox Sale'],Oct:['Halloween'],Nov:['Black Friday'],Dec:[]},
-    weekData:{},spans:{}
+    "label": "CDN Events",
+    "type": "chip",
+    "chipClass": "chip-cdn",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [
+        "Happy New Year"
+      ],
+      "Feb": [
+        "Valentine's Day",
+        "Family Day"
+      ],
+      "Mar": [
+        "Int'l Women's Day"
+      ],
+      "Apr": [
+        "Easter",
+        "Earth Day"
+      ],
+      "May": [
+        "Mother's Day"
+      ],
+      "Jun": [
+        "Father's Day"
+      ],
+      "Jul": [
+        "BC Day",
+        "Pride"
+      ],
+      "Aug": [],
+      "Sep": [
+        "Labour Day",
+        "Equinox Sale"
+      ],
+      "Oct": [
+        "Halloween"
+      ],
+      "Nov": [
+        "Black Friday"
+      ],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Promotions', type:'chip', chipClass:'chip-promo', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['10% off'],Oct:['10% off'],Nov:['25% off'],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Promotions",
+    "type": "chip",
+    "chipClass": "chip-promo",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [],
+      "Aug": [],
+      "Sep": [
+        "10% off"
+      ],
+      "Oct": [
+        "10% off"
+      ],
+      "Nov": [
+        "25% off"
+      ],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Newsletter', type:'chip', chipClass:'chip-nl', dividerAbove:true,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Teaser','Launch','Last Call'],Oct:['Weekend Sale'],Nov:[],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Newsletter",
+    "type": "chip",
+    "chipClass": "chip-nl",
+    "dividerAbove": true,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [],
+      "Aug": [],
+      "Sep": [
+        "Teaser",
+        "Launch",
+        "Last Call"
+      ],
+      "Oct": [
+        "Weekend Sale"
+      ],
+      "Nov": [],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Theme', type:'chip', chipClass:'chip-theme', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:['Pride'],Aug:[],Sep:[],Oct:[],Nov:['Black Friday'],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Theme",
+    "type": "chip",
+    "chipClass": "chip-theme",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [
+        "Pride"
+      ],
+      "Aug": [],
+      "Sep": [],
+      "Oct": [],
+      "Nov": [
+        "Black Friday"
+      ],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Blog', type:'chip', chipClass:'chip-blog', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:['Xmas long lead'],Oct:['Xmas mid lead'],Nov:['Xmas bookings'],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Blog",
+    "type": "chip",
+    "chipClass": "chip-blog",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [],
+      "Aug": [],
+      "Sep": [
+        "Xmas long lead"
+      ],
+      "Oct": [
+        "Xmas mid lead"
+      ],
+      "Nov": [
+        "Xmas bookings"
+      ],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Events / Partners', type:'chip', chipClass:'chip-event', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Events / Partners",
+    "type": "chip",
+    "chipClass": "chip-event",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [],
+      "Aug": [],
+      "Sep": [],
+      "Oct": [],
+      "Nov": [],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Contests', type:'chip', chipClass:'chip-contest', dividerAbove:false,
-    data:{Jan:[],Feb:[],Mar:[],Apr:[],May:[],Jun:[],Jul:[],Aug:[],Sep:[],Oct:[],Nov:[],Dec:[]},
-    weekData:{},spans:{}
+    "label": "Contests",
+    "type": "chip",
+    "chipClass": "chip-contest",
+    "dividerAbove": false,
+    "data": {
+      "Jan": [],
+      "Feb": [],
+      "Mar": [],
+      "Apr": [],
+      "May": [],
+      "Jun": [],
+      "Jul": [],
+      "Aug": [],
+      "Sep": [],
+      "Oct": [],
+      "Nov": [],
+      "Dec": []
+    },
+    "weekData": {},
+    "spans": {}
   },
   {
-    label:'Influencers', type:'infl', chipClass:'', dividerAbove:true,
-    data:{Jan:'2/wk',Feb:'3/wk',Mar:'4/wk',Apr:'5/wk',May:'6/wk',Jun:'7/wk',Jul:'8/wk',Aug:'9/wk',Sep:'10/wk',Oct:'11/wk',Nov:'12/wk',Dec:'12/wk'},
-    weekData:{},spans:{}
-  },
+    "label": "Influencers",
+    "type": "infl",
+    "chipClass": "",
+    "dividerAbove": true,
+    "data": {
+      "Jan": "2/wk",
+      "Feb": "3/wk",
+      "Mar": "4/wk",
+      "Apr": "5/wk",
+      "May": "6/wk",
+      "Jun": "7/wk",
+      "Jul": "8/wk",
+      "Aug": "9/wk",
+      "Sep": "10/wk",
+      "Oct": "11/wk",
+      "Nov": "12/wk",
+      "Dec": "12/wk"
+    },
+    "weekData": {},
+    "spans": {}
+  }
 ];
 
 
