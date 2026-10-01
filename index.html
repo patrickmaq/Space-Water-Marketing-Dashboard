@@ -721,7 +721,8 @@ const DB = {
     "May '26",
     "Jun '26",
     "Jul '26",
-    "Aug '26"
+    "Aug '26",
+    "Sep '26"
   ],
   "traffic": [
     2,
@@ -743,7 +744,8 @@ const DB = {
     2700,
     2300,
     2500,
-    2400
+    2400,
+    2000
   ],
   "unique": [
     2,
@@ -765,7 +767,8 @@ const DB = {
     2400,
     2000,
     2300,
-    2200
+    2200,
+    1800
   ],
   "purchases": [
     0,
@@ -787,7 +790,8 @@ const DB = {
     7,
     10,
     7,
-    8
+    8,
+    10
   ],
   "cvr": [
     0,
@@ -809,7 +813,8 @@ const DB = {
     0.2593,
     0.4348,
     0.28,
-    0.3333
+    0.3333,
+    0.5
   ],
   "aov": [
     0,
@@ -831,7 +836,8 @@ const DB = {
     188.07,
     168.73,
     154.36,
-    175.09
+    175.09,
+    174.6
   ],
   "revenue": [
     0,
@@ -853,7 +859,8 @@ const DB = {
     1316.5,
     1687.3,
     1080.5,
-    1400.75
+    1400.75,
+    1746.05
   ],
   "roas": [
     null,
@@ -875,7 +882,8 @@ const DB = {
     4.3883,
     5.6243,
     3.6017,
-    4.6692
+    4.6692,
+    5.8202
   ],
   "meta": [
     0,
@@ -892,6 +900,7 @@ const DB = {
     270,
     296,
     290,
+    300,
     300,
     300,
     300,
@@ -919,7 +928,8 @@ const DB = {
     728,
     796,
     859,
-    8960
+    896,
+    937
   ],
   "emailGrowth": [
     0,
@@ -941,7 +951,8 @@ const DB = {
     56,
     68,
     63,
-    37
+    37,
+    41
   ]
 };
 
@@ -1256,6 +1267,8 @@ function destroyCharts(){Object.values(CHARTS).forEach(c=>{try{c.destroy()}catch
    INIT
    ═══════════════════════════════════════════════════════════════════════ */
 function init(){
+  // Always open the latest month included in the dashboard data on a fresh load.
+  currentTab = DB.months.length - 1;
   if(isClient){
     document.getElementById('client-badge').style.display='flex';
   } else {
@@ -1279,7 +1292,9 @@ function buildTabs(){
   let html = '';
   if(!isClient){
     html += `<button class="tab special ${currentTab==='all'?'active':''}" onclick="switchTab('all')">All Time</button>`;
-    html += `<button class="tab special ${currentTab==='ytd'?'active':''}" onclick="switchTab('ytd')">YTD 2026</button>`;
+    const latestYr = DB.months[DB.months.length-1].match(/'(\d{2})$/)?.[1];
+    const latestFullYr = latestYr ? 2000 + Number(latestYr) : new Date().getFullYear();
+    html += `<button class="tab special ${currentTab==='ytd'?'active':''}" onclick="switchTab('ytd')">YTD ${latestFullYr}</button>`;
     html += `<div class="tab-divider"></div>`;
   }
   DB.months.forEach((m,i)=>{
@@ -1943,30 +1958,33 @@ function renderMonth(container,idx){
    YTD VIEW
    ═══════════════════════════════════════════════════════════════════════ */
 function renderYTD(container){
-  const yr='26';
-  const ytdIdx=DB.months.map((m,i)=>m.includes(`'${yr}`)?i:null).filter(i=>i!==null);
+  // Use the year of the latest month in DB so YTD rolls forward automatically.
+  const latestLabel = DB.months[DB.months.length - 1];
+  const yr = latestLabel.match(/'(\d{2})$/)?.[1] || String(new Date().getFullYear()).slice(-2);
+  const fullYear = 2000 + Number(yr);
+  const ytdIdx=DB.months.map((m,i)=>m.endsWith(`'${yr}`)?i:null).filter(i=>i!==null);
   const ytdMonths=ytdIdx.map(i=>DB.months[i]);
   const ytdRev=ytdIdx.map(i=>DB.revenue[i]);
   const ytdTr=ytdIdx.map(i=>DB.traffic[i]);
   const ytdEm=ytdIdx.map(i=>DB.email[i]);
-  const ytdRoas=ytdIdx.map(i=>DB.roas[i]).filter(v=>v!==null);
-  const totalRev=ytdRev.reduce((s,v)=>s+v,0);
-  const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
-  const avgAov=ytdIdx.filter(i=>DB.aov[i]>0).map(i=>DB.aov[i]);
-  const avgAovVal=avgAov.length?avgAov.reduce((s,v)=>s+v,0)/avgAov.length:0;
-  const totalTraffic=ytdTr.reduce((s,v)=>s+v,0);
-  const latestEmail=ytdEm.filter(v=>v>0).pop()||0;
-  const avgRoas=ytdRoas.length?ytdRoas.reduce((s,v)=>s+v,0)/ytdRoas.length:0;
-  const totalMeta=ytdIdx.reduce((s,i)=>s+DB.meta[i],0);
+  const totalRev=ytdRev.reduce((s,v)=>s+(Number(v)||0),0);
+  const totalPurch=ytdIdx.reduce((s,i)=>s+(Number(DB.purchases[i])||0),0);
+  // Weighted AOV: total YTD revenue / total YTD completed orders.
+  const avgAovVal=totalPurch>0 ? totalRev/totalPurch : 0;
+  const totalTraffic=ytdTr.reduce((s,v)=>s+(Number(v)||0),0);
+  const latestEmail=ytdEm.filter(v=>Number(v)>0).pop()||0;
+  const totalMeta=ytdIdx.reduce((s,i)=>s+(Number(DB.meta[i])||0),0);
+  // Blended ROAS: total YTD revenue / total YTD Meta spend.
+  const avgRoas=totalMeta>0 ? totalRev/totalMeta : 0;
 
   container.innerHTML=`
   <div class="view-header fade-up d1">
     <div class="view-eyebrow">Year to Date</div>
-    <h1 class="view-title">2026 Overview</h1>
-    <div class="view-sub">Jan 2026 through ${DB.months[DB.months.length-1]}</div>
+    <h1 class="view-title">${fullYear} Overview</h1>
+    <div class="view-sub">Jan ${fullYear} through ${latestLabel}</div>
   </div>
   <div class="kpi-grid fade-up d2">
-    ${kpiCard('Total Revenue',fmt$(totalRev,2),'2026 YTD',null)}
+    ${kpiCard('Total Revenue',fmt$(totalRev,2),`${fullYear} YTD`,null)}
     ${kpiCard('Total Orders',fmtN(totalPurch),'purchases',null)}
     ${kpiCard('Avg AOV',avgAovVal?fmt$(avgAovVal,2):'—','avg order value',null)}
     ${kpiCard('Total Traffic',fmtN(totalTraffic),'sessions',null)}
@@ -1976,14 +1994,14 @@ function renderYTD(container){
   <div class="chart-row c53 fade-up d3">
     <div class="card chart-card">
       <div class="chart-header">
-        <div><div class="chart-label">Revenue 2026 YTD</div><div class="chart-big">${fmt$(totalRev,2)}</div><div class="chart-sub">${ytdMonths.length} months</div></div>
+        <div><div class="chart-label">Revenue ${fullYear} YTD</div><div class="chart-big">${fmt$(totalRev,2)}</div><div class="chart-sub">${ytdMonths.length} months</div></div>
         <div style="text-align:right"><div class="chart-label">Meta Spend</div><div class="chart-small" style="color:var(--blue)">$${totalMeta.toLocaleString()}</div></div>
       </div>
       <div class="chart-canvas-wrap"><canvas id="ytdRevChart"></canvas></div>
     </div>
     <div class="card chart-card">
       <div class="chart-header">
-        <div><div class="chart-label">Traffic 2026 YTD</div><div class="chart-big">${fmtN(totalTraffic)}</div><div class="chart-sub">total sessions</div></div>
+        <div><div class="chart-label">Traffic ${fullYear} YTD</div><div class="chart-big">${fmtN(totalTraffic)}</div><div class="chart-sub">total sessions</div></div>
       </div>
       <div class="chart-canvas-wrap"><canvas id="ytdTrafficChart"></canvas></div>
     </div>
@@ -2168,13 +2186,16 @@ async function generateSummary(idx,mode,compareIdx=null){
         <div><div class="summary-stat-label">Email List</div><div class="summary-stat-val">${fmtN(curr.email)}</div><div class="summary-stat-delta ${curr.emailGrowth>0?'up':'flat'}">${curr.emailGrowth>0?`+${curr.emailGrowth} this month`:''}</div></div>`;
     }
   } else if(mode==='ytd'){
-    const yr='26';
-    const ytdIdx=DB.months.map((m,i)=>m.includes(`'${yr}`)?i:null).filter(i=>i!==null);
-    const totalRev=ytdIdx.reduce((s,i)=>s+DB.revenue[i],0);
-    const totalPurch=ytdIdx.reduce((s,i)=>s+DB.purchases[i],0);
-    const totalTraffic=ytdIdx.reduce((s,i)=>s+DB.traffic[i],0);
-    const avgRoas=DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).reduce((s,v)=>s+v,0)/DB.roas.filter(v=>v!==null).slice(-ytdIdx.length).length;
-    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD 2026 business health summary.\n2026 YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
+    const latestLabel=DB.months[DB.months.length-1];
+    const yr=latestLabel.match(/'(\d{2})$/)?.[1] || String(new Date().getFullYear()).slice(-2);
+    const fullYear=2000+Number(yr);
+    const ytdIdx=DB.months.map((m,i)=>m.endsWith(`'${yr}`)?i:null).filter(i=>i!==null);
+    const totalRev=ytdIdx.reduce((s,i)=>s+(Number(DB.revenue[i])||0),0);
+    const totalPurch=ytdIdx.reduce((s,i)=>s+(Number(DB.purchases[i])||0),0);
+    const totalTraffic=ytdIdx.reduce((s,i)=>s+(Number(DB.traffic[i])||0),0);
+    const totalMeta=ytdIdx.reduce((s,i)=>s+(Number(DB.meta[i])||0),0);
+    const avgRoas=totalMeta>0?totalRev/totalMeta:0;
+    prompt=`You are a marketing analyst for Space Water, a Canadian water brand. Write a concise, honest 3-4 sentence YTD ${fullYear} business health summary.\n${fullYear} YTD data: Revenue $${totalRev.toFixed(2)}, Orders ${totalPurch}, Traffic ${totalTraffic} sessions, Avg ROAS ${avgRoas?avgRoas.toFixed(2):'n/a'}.\nAll-time context: Total revenue $${DB.revenue.reduce((s,v)=>s+v,0).toFixed(2)}, started Jan 2025.\nBe honest about trajectory. Mention what's working and what needs attention. Flowing prose, no bullets.`;
   } else {
     const totalRev=DB.revenue.reduce((s,v)=>s+v,0);
     const totalPurch=DB.purchases.reduce((s,v)=>s+v,0);
